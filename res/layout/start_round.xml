@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:orientation="vertical">
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/CourseName"/>
+<Spinner
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/CourseName"/>
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/Person"/>
+<Spinner
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/PersonChooser"/>
+    
+<Button
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/StartRound"
+    android:text="@string/Start"/>
+</LinearLayout>

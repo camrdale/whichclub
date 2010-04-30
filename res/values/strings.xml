@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Which Club</string>
+    <string name="NewRound">Start A New Round</string>
+    <string name="FindCourse">Find A Course</string>
+    <string name="CourseName">Course Name</string>
+    <string name="Person">Player</string>
+    <string name="Start">Start</string>
+    <string name="UnderConstruction">Under Construction</string>
+    <string name="LoadingStats">Loading Statistics ...</string>
+</resources>
