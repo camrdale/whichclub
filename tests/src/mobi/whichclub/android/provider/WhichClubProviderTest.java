@@ -1,6 +1,3 @@
-/**
- * 
- */
 package mobi.whichclub.android.provider;
 
 import mobi.whichclub.android.data.Course;
@@ -14,13 +11,18 @@ import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
 /**
- * @author cdale
+ * @author camrdale
  *
  */
-public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> {
+public final class WhichClubProviderTest
+			extends ProviderTestCase2<WhichClubProvider> {
     
+	/** Logging tag. */
 	private static final String TAG = "WhichClubProviderTest";
     
+    /**
+     * Initialize the ProviderTestCase for the WhichClubProvider.
+     */
     public WhichClubProviderTest() {
 		super(WhichClubProvider.class, WhichClubProvider.AUTHORITY);
 	}
@@ -35,6 +37,10 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         super.tearDown();
     }
 
+    /**
+     * Find the ID for the Default course.
+     * @return the ID
+     */
     private long getDefaultCourseId() {
     	Cursor cursor = getMockContentResolver().query(
     			Course.CONTENT_URI, Course.PROJECTION,
@@ -55,9 +61,13 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         return courseId;
     }
 
+    /**
+     * Test querying for a single course.
+     */
     @SmallTest
     public void testQuerySingleCourse() {
-    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI, Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
+    			Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
     	assertNotNull(cursor);
     	cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -70,6 +80,9 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         cursor.close();
     }
 
+    /**
+     * Test querying for all of multiple courses.
+     */
     @SmallTest
     public void testQueryMultipleCourses() {
     	ContentValues values = new ContentValues();
@@ -78,7 +91,8 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
     	values.put("name", "NewCourse2");
     	getMockContentResolver().insert(Course.CONTENT_URI, values);
 
-    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI, Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
+    			Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
     	assertNotNull(cursor);
     	cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -90,6 +104,9 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         cursor.close();
     }
     
+    /**
+     * Test querying for a single of many courses.
+     */
     @SmallTest
     public void testQueryOneOfManyCourses() {
     	long courseId = getDefaultCourseId();
@@ -101,7 +118,8 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
     	getMockContentResolver().insert(Course.CONTENT_URI, values);
 
         Uri result = ContentUris.withAppendedId(Course.CONTENT_URI, courseId);
-        Cursor cursor = getMockContentResolver().query(result, Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+        Cursor cursor = getMockContentResolver().query(result,
+        		Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
     	assertNotNull(cursor);
     	cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -114,6 +132,9 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         cursor.close();
     }
 
+    /**
+     * Test querying for a single course using a WHERE clause.
+     */
     @SmallTest
     public void testQueryWithWhere() {
     	ContentValues values = new ContentValues();
@@ -125,7 +146,8 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
     	long courseId = getDefaultCourseId();
 
         Uri result = ContentUris.withAppendedId(Course.CONTENT_URI, courseId);
-        Cursor cursor = getMockContentResolver().query(result, Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+        Cursor cursor = getMockContentResolver().query(result,
+        		Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
     	assertNotNull(cursor);
     	cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -138,13 +160,18 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         cursor.close();
     }
 
+    /**
+     * Test inserting a new course.
+     */
     @SmallTest
     public void testInsertingCourse() {
     	ContentValues values = new ContentValues();
     	values.put("name", "NewCourse");
-    	Uri result = getMockContentResolver().insert(Course.CONTENT_URI, values);
+    	Uri result =
+    		getMockContentResolver().insert(Course.CONTENT_URI, values);
     	
-    	Cursor cursor = getMockContentResolver().query(result, Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+    	Cursor cursor = getMockContentResolver().query(result,
+    			Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
     	assertNotNull(cursor);
     	cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -157,6 +184,9 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         cursor.close();
     }
 
+    /**
+     * Test updating a single course.
+     */
     @SmallTest
     public void testUpdatingSingleCourse() {
     	long courseId = getDefaultCourseId();
@@ -164,10 +194,12 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         Uri result = ContentUris.withAppendedId(Course.CONTENT_URI, courseId);
         ContentValues values = new ContentValues();
         values.put(Course.PAR, 32);
-        int updated = getMockContentResolver().update(result, values, null, null);
+        int updated =
+        	getMockContentResolver().update(result, values, null, null);
         assertEquals(1, updated);
 
-    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI, Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
+    			Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
     	assertNotNull(cursor);
     	cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -181,6 +213,9 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         cursor.close();
     }
 
+    /**
+     * Test updating multiple courses.
+     */
     @SmallTest
     public void testUpdatingMultipleCourses() {
     	ContentValues values = new ContentValues();
@@ -191,10 +226,12 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         
         values = new ContentValues();
         values.put(Course.PAR, 32);
-        int updated = getMockContentResolver().update(Course.CONTENT_URI, values, null, null);
+        int updated = getMockContentResolver().update(Course.CONTENT_URI,
+        		values, null, null);
         assertEquals(3, updated);
 
-    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI, Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
+    			Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
     	assertNotNull(cursor);
     	cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -207,6 +244,9 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         cursor.close();
     }
 
+    /**
+     * Test updating one of multiple courses.
+     */
     @SmallTest
     public void testUpdatingOneOfManyCourses() {
     	long courseId = getDefaultCourseId();
@@ -220,10 +260,12 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
     	Uri result = ContentUris.withAppendedId(Course.CONTENT_URI, courseId);
         values = new ContentValues();
         values.put(Course.PAR, 32);
-        int updated = getMockContentResolver().update(result, values, null, null);
+        int updated =
+        	getMockContentResolver().update(result, values, null, null);
         assertEquals(1, updated);
 
-    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI, Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
+    			Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
     	assertNotNull(cursor);
     	cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -240,6 +282,9 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         cursor.close();
     }
 
+    /**
+     * Test deleting a single course.
+     */
     @SmallTest
     public void testDeletingSingleCourse() {
     	long courseId = getDefaultCourseId();
@@ -248,11 +293,12 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         int deleted = getMockContentResolver().delete(result, null, null);
         assertEquals(1, deleted);
 
-    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI, Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
+    			Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
     	assertNotNull(cursor);
     	cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-        	fail("There should not be any courses left after deleting the default one");
+        	fail("There should be 0 courses after deleting the default one");
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " courses");
@@ -260,6 +306,9 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         cursor.close();
     }
 
+    /**
+     * Test deleting multiple courses.
+     */
     @SmallTest
     public void testDeletingMultipleCourses() {
     	ContentValues values = new ContentValues();
@@ -268,15 +317,17 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
     	values.put("name", "NewCourse2");
     	getMockContentResolver().insert(Course.CONTENT_URI, values);
 
-    	int deleted = getMockContentResolver().delete(Course.CONTENT_URI, null, null);
+    	int deleted =
+    		getMockContentResolver().delete(Course.CONTENT_URI, null, null);
     	Log.d(TAG, "Deleted " + deleted + " courses");
         assertEquals(3, deleted);
 
-    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI, Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
+    			Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
     	assertNotNull(cursor);
     	cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-        	fail("There should not be any courses left after deleting the default one");
+        	fail("There should be 0 courses after deleting the default one");
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " courses");
@@ -284,6 +335,9 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         cursor.close();
     }
 
+    /**
+     * Test deleting one of multiple courses.
+     */
     @SmallTest
     public void testDeletingOneOfManyCourses() {
     	long courseId = getDefaultCourseId();
@@ -298,7 +352,8 @@ public class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> 
         int deleted = getMockContentResolver().delete(result, null, null);
         assertEquals(1, deleted);
 
-    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI, Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+    	Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
+    			Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
     	assertNotNull(cursor);
     	cursor.moveToFirst();
         while (!cursor.isAfterLast()) {

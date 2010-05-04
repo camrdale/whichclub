@@ -10,8 +10,6 @@ import mobi.whichclub.android.data.Round;
 import mobi.whichclub.android.data.Shot;
 import mobi.whichclub.android.provider.DbHelper;
 
-import mobi.whichclub.android.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -24,35 +22,40 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * The main UI page.
+ * @author camrdale
+ */
 public class Main extends Activity {
 
+	/** The listener for clicks on the NewRound button. */
     private OnClickListener mNewRoundListener = new OnClickListener() {
-        
         @Override
-        public void onClick(View v) {
+        public void onClick(final View v) {
             launchRound();
         }
     };
     
+	/** The listener for clicks on the FindCourse button. */
     private OnClickListener mFindCourseListener = new OnClickListener() {
-        
         @Override
-        public void onClick(View v) {
+        public void onClick(final View v) {
             alertUnimplemented();
         }
     };
 
-    /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public final void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Inflate our UI from its XML layout description.
         setContentView(R.layout.main);
 
         // Hook up button presses to the appropriate event handler.
-        ((Button) findViewById(R.id.NewRound)).setOnClickListener(mNewRoundListener);
-        ((Button) findViewById(R.id.FindCourse)).setOnClickListener(mFindCourseListener);
+        ((Button) findViewById(R.id.NewRound))
+        		.setOnClickListener(mNewRoundListener);
+        ((Button) findViewById(R.id.FindCourse))
+        		.setOnClickListener(mFindCourseListener);
         
         StringBuilder stats = new StringBuilder();
         DbHelper helper = new DbHelper(getApplicationContext());
@@ -73,12 +76,15 @@ public class Main extends Activity {
     }
 
     /**
-     * @param db
-     * @param class1
+     * Count the number of records in the table.
+     * @param db the database to use
+     * @param table the table name
+     * @return the number of records
      */
-    private String countRecords(SQLiteDatabase db, String table) {
+    private String countRecords(final SQLiteDatabase db, final String table) {
         String stats = table + "s: ";
-        Cursor cursor = db.query(table, new String[] {"count(_id)"}, null, null, null, null, null);
+        Cursor cursor = db.query(table, new String[] {"count(_id)"},
+        		null, null, null, null, null);
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
             stats += cursor.getLong(0) + "\n";
@@ -91,12 +97,12 @@ public class Main extends Activity {
     /**
      * Display an alert indicating the feature has not yet been implemented.
      */
-    protected void alertUnimplemented() {
+    protected final void alertUnimplemented() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("That feature has not yet been implemented.");
         builder.setCancelable(false);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
+            public void onClick(final DialogInterface dialog, final int id) {
                 dialog.cancel();
             }
         });
@@ -107,7 +113,7 @@ public class Main extends Activity {
     /**
      * Launch the StartRound activity.
      */
-    protected void launchRound() {
+    protected final void launchRound() {
         Intent i = new Intent(this, StartRound.class);
         startActivity(i);
     }

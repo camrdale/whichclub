@@ -1,7 +1,3 @@
-/**
- * 
- */
-
 package mobi.whichclub.android.provider;
 
 import android.content.ContentProvider;
@@ -11,52 +7,54 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.util.HashMap;
-
 import mobi.whichclub.android.data.Course;
 
 /**
- * Provides access to a database of notes. Each note has a title, the note
- * itself, a creation date and a modified data.
+ * Provides access to the WhichClub database of shots.
+ * @author camrdale
  */
 public class WhichClubProvider extends ContentProvider {
 
+	/** Logging tag. */
     private static final String TAG = "WhichClubProvider";
-
-    private static HashMap<String, String> sCourseProjectionMap;
-
+    /** The authority for the provider's URIs. */
     public static final String AUTHORITY = "mobi.whichclub.android.data";
+    
+    /** URI matching results. */
     private static final int COURSES = 1;
+    /** URI matching results. */
     private static final int COURSE_ID = 2;
-
-    private static final UriMatcher sUriMatcher;
-
-    private DbHelper mOpenHelper;
+    /** URI matcher. */
+    private static final UriMatcher URI_MATCHER;
+    /** The database helper to use to open it. */
+    private SQLiteOpenHelper mOpenHelper;
 
     @Override
-    public boolean onCreate() {
+    public final boolean onCreate() {
         mOpenHelper = new DbHelper(getContext());
         return true;
     }
     
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-            String sortOrder) {
+    public final Cursor query(final Uri uri, final String[] projection,
+    		final String selection, final String[] selectionArgs,
+            final String sortOrder) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(Course.TABLE_NAME);
 
-        switch (sUriMatcher.match(uri)) {
+        switch (URI_MATCHER.match(uri)) {
         case COURSES:
-            qb.setProjectionMap(sCourseProjectionMap);
+            qb.setProjectionMap(Course.PROJECTION_MAP);
             break;
 
         case COURSE_ID:
-            qb.setProjectionMap(sCourseProjectionMap);
+            qb.setProjectionMap(Course.PROJECTION_MAP);
             qb.appendWhere(Course._ID + "=" + uri.getPathSegments().get(1));
             break;
 
@@ -74,18 +72,19 @@ public class WhichClubProvider extends ContentProvider {
 
         // Get the database and run the query
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = qb.query(db, projection, selection, selectionArgs, null, null, orderBy);
+        Cursor c = qb.query(db, projection, selection, selectionArgs,
+        		null, null, orderBy);
 
-        // Tell the cursor what uri to watch, so it knows when its source data changes
+        // Tell the cursor what URI to watch for source data changes
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
     }
 
     @Override
-    public String getType(Uri uri) {
-        switch (sUriMatcher.match(uri)) {
+    public final String getType(final Uri uri) {
+        switch (URI_MATCHER.match(uri)) {
         case COURSES:
-            return Course.CONTENT_TYPE;
+            return Course.CONTENT_MULTI_TYPE;
 
         case COURSE_ID:
             return Course.CONTENT_ITEM_TYPE;
@@ -96,11 +95,15 @@ public class WhichClubProvider extends ContentProvider {
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues initialValues) {
+    public final Uri insert(final Uri uri, final ContentValues initialValues) {
+    	Log.d(TAG, "Inserting " + uri + ": " + initialValues.toString());
+
         // Validate the requested uri
-        if (sUriMatcher.match(uri) != COURSES) {
+        if (URI_MATCHER.match(uri) != COURSES) {
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
+        
+        Log.d(TAG, "Inserting URI: " + uri);
 
         ContentValues values;
         if (initialValues != null) {
@@ -122,7 +125,8 @@ public class WhichClubProvider extends ContentProvider {
 //
 //        if (values.containsKey(NotePad.Notes.TITLE) == false) {
 //            Resources r = Resources.getSystem();
-//            values.put(NotePad.Notes.TITLE, r.getString(android.R.string.untitled));
+//            values.put(NotePad.Notes.TITLE,
+//        			r.getString(android.R.string.untitled));
 //        }
 //
 //        if (values.containsKey(NotePad.Notes.NOTE) == false) {
@@ -132,7 +136,8 @@ public class WhichClubProvider extends ContentProvider {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         long rowId = db.insert(Course.TABLE_NAME, Course.NAME, values);
         if (rowId > 0) {
-            Uri courseUri = ContentUris.withAppendedId(Course.CONTENT_URI, rowId);
+            Uri courseUri =
+            	ContentUris.withAppendedId(Course.CONTENT_URI, rowId);
             getContext().getContentResolver().notifyChange(courseUri, null);
             return courseUri;
         }
@@ -141,10 +146,14 @@ public class WhichClubProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String where, String[] whereArgs) {
+    public final int delete(final Uri uri,
+    		final String where, final String[] whereArgs) {
+    	Log.d(TAG, "Deleting " + uri + " where "
+    			+ where + "[" + whereArgs + "]");
+    	
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int count;
-        switch (sUriMatcher.match(uri)) {
+        switch (URI_MATCHER.match(uri)) {
         case COURSES:
         	if (where == null || where.length() == 0) {
         		count = db.delete(Course.TABLE_NAME, "1", whereArgs);
@@ -155,8 +164,11 @@ public class WhichClubProvider extends ContentProvider {
 
         case COURSE_ID:
             String courseId = uri.getPathSegments().get(1);
-            count = db.delete(Course.TABLE_NAME, Course._ID + "=" + courseId
-                    + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""), whereArgs);
+            String whereWithId = Course._ID + "=" + courseId;
+            if (!TextUtils.isEmpty(where)) {
+            	whereWithId += " AND (" + where + ')';
+            }
+            count = db.delete(Course.TABLE_NAME, whereWithId, whereArgs);
             break;
 
         default:
@@ -168,18 +180,26 @@ public class WhichClubProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String where, String[] whereArgs) {
-        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+    public final int update(final Uri uri, final ContentValues values,
+    		final String where, final String[] whereArgs) {
+    	Log.d(TAG, "Updating " + uri + " where "
+    			+ where + "[" + whereArgs + "]");
+
+    	SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int count;
-        switch (sUriMatcher.match(uri)) {
+        switch (URI_MATCHER.match(uri)) {
         case COURSES:
             count = db.update(Course.TABLE_NAME, values, where, whereArgs);
             break;
 
         case COURSE_ID:
-            String noteId = uri.getPathSegments().get(1);
-            count = db.update(Course.TABLE_NAME, values, Course._ID + "=" + noteId
-                    + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""), whereArgs);
+            String courseId = uri.getPathSegments().get(1);
+            String whereWithId = Course._ID + "=" + courseId;
+            if (!TextUtils.isEmpty(where)) {
+            	whereWithId += " AND (" + where + ')';
+            }
+            count = db.update(Course.TABLE_NAME, values,
+            		whereWithId, whereArgs);
             break;
 
         default:
@@ -191,18 +211,8 @@ public class WhichClubProvider extends ContentProvider {
     }
 
     static {
-        sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        sUriMatcher.addURI(AUTHORITY, Course.TABLE_NAME, COURSES);
-        sUriMatcher.addURI(AUTHORITY, Course.TABLE_NAME + "/#", COURSE_ID);
-
-        sCourseProjectionMap = new HashMap<String, String>();
-        sCourseProjectionMap.put(Course._ID, Course._ID);
-        sCourseProjectionMap.put(Course.CITY, Course.CITY);
-        sCourseProjectionMap.put(Course.COUNTRY, Course.COUNTRY);
-        sCourseProjectionMap.put(Course.LATITUDE, Course.LATITUDE);
-        sCourseProjectionMap.put(Course.LONGITUDE, Course.LONGITUDE);
-        sCourseProjectionMap.put(Course.NAME, Course.NAME);
-        sCourseProjectionMap.put(Course.PAR, Course.PAR);
-        sCourseProjectionMap.put(Course.STATE_PROV, Course.STATE_PROV);
+        URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
+        URI_MATCHER.addURI(AUTHORITY, Course.TABLE_NAME, COURSES);
+        URI_MATCHER.addURI(AUTHORITY, Course.TABLE_NAME + "/#", COURSE_ID);
     }
 }

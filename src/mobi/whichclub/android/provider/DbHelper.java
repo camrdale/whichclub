@@ -1,6 +1,3 @@
-/**
- * 
- */
 package mobi.whichclub.android.provider;
 
 import java.io.File;
@@ -21,35 +18,47 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
- * @author cdale
- *
+ * Database helper for working with the WhichClub database.
+ * @author camrdale
  */
 public class DbHelper extends SQLiteOpenHelper {
     
+	/** Logging tag. */
     private static final String TAG = "DbHelper";
-    
+    /** The name of the database file. */
     public static final String DATABASE_FILENAME = "WhichClub.db";
-    
+    /** The current version of the database. */
     public static final int DATABASE_VERSION = 1;
 
-    public static final File getDatabaseFile(Context context) {
+    /**
+     * Get the database file used by this helper.
+     * @param context the application context
+     * @return the database file
+     */
+    public static final File getDatabaseFile(final Context context) {
         return context.getDatabasePath(DATABASE_FILENAME);
     }
 
-    public static final boolean deleteDatabase(Context context) {
+    /**
+     * Delete the database.
+     * @param context the application context
+     * @return whether the database was deleted
+     */
+    public static final boolean deleteDatabase(final Context context) {
     	Log.w(TAG, "Deleting the database: " + getDatabaseFile(context));
     	return context.deleteDatabase(DATABASE_FILENAME);
     }
 
     /**
-     * @param context
+     * Initialize the object to create the database.
+     * @param context the application context
      */
-    public DbHelper(Context context) {
+    public DbHelper(final Context context) {
         super(context, DATABASE_FILENAME, null, DATABASE_VERSION);
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) {
+    public final void onCreate(final SQLiteDatabase db) {
         Log.i(TAG, "Creating a new database: " + db.getPath());
         db.execSQL("CREATE TABLE " + Player.TABLE_NAME + " ("
                 + Player._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -102,24 +111,28 @@ public class DbHelper extends SQLiteOpenHelper {
                 + ");");
         db.execSQL("CREATE TABLE " + Shot.TABLE_NAME + " ("
                 + Shot._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + Shot.BALL + " INTEGER,"
-                + Shot.CLUB + " INTEGER,"
-                + Shot.DISTANCE + " REAL,"
-                + Shot.HOLE + " INTEGER,"
-                + Shot.LATERAL + " REAL,"
-                + Shot.NUMBER + " INTEGER,"
                 + Shot.ROUND + " INTEGER,"
-                + Shot.WIND_DIR + " REAL,"
-                + Shot.WIND_SPEED + " REAL,"
+                + Shot.HOLE + " INTEGER,"
+                + Shot.CLUB + " INTEGER,"
+                + Shot.BALL + " INTEGER,"
+                + Shot.NUMBER + " INTEGER,"
+                + Shot.DISTANCE + " REAL,"
+                + Shot.LATERAL + " REAL,"
                 + Shot.START_LATITUDE + " REAL,"
                 + Shot.START_LONGITUDE + " REAL,"
                 + Shot.END_LATITUDE + " REAL,"
-                + Shot.END_LONGITUDE + " REAL"
+                + Shot.END_LONGITUDE + " REAL,"
+                + Shot.WIND_DIR + " REAL,"
+                + Shot.WIND_SPEED + " REAL"
                 + ");");
         initializeDatabase(db);
     }
     
-    private static void initializeDatabase(SQLiteDatabase db) {
+    /**
+     * Initialize a new database with some default records.
+     * @param db the database to initialize
+     */
+    private static void initializeDatabase(final SQLiteDatabase db) {
         Log.i(TAG, "Initializing the new database");
         initializeBall(db);
         initializeClubs(db);
@@ -127,7 +140,11 @@ public class DbHelper extends SQLiteOpenHelper {
         initializeCourse(db);
     }
     
-    private static void initializePlayer(SQLiteDatabase db) {
+    /**
+     * Initialize a new database with a default player.
+     * @param db the database to initialize
+     */
+    private static void initializePlayer(final SQLiteDatabase db) {
         Log.d(TAG, "Creating a default player");
         ContentValues values = new ContentValues();
         values.put(Player.NAME, "Default");
@@ -135,7 +152,11 @@ public class DbHelper extends SQLiteOpenHelper {
         
     }
     
-    private static void initializeBall(SQLiteDatabase db) {
+    /**
+     * Initialize a new database with a default ball.
+     * @param db the database to initialize
+     */
+    private static void initializeBall(final SQLiteDatabase db) {
         Log.d(TAG, "Creating a default ball");
         ContentValues values = new ContentValues();
         values.put(Ball.MANUFACTURER, "Unknown");
@@ -144,7 +165,11 @@ public class DbHelper extends SQLiteOpenHelper {
         
     }
     
-    private static void initializeCourse(SQLiteDatabase db) {
+    /**
+     * Initialize a new database with a default 18-hole course.
+     * @param db the database to initialize
+     */
+    private static void initializeCourse(final SQLiteDatabase db) {
         Log.d(TAG, "Creating a default course");
         ContentValues values = new ContentValues();
         values.put(Course.NAME, "Default");
@@ -159,7 +184,11 @@ public class DbHelper extends SQLiteOpenHelper {
         
     }
     
-    private static void initializeClubs(SQLiteDatabase db) {
+    /**
+     * Initialize a new database with a default set of clubs.
+     * @param db the database to initialize
+     */
+    private static void initializeClubs(final SQLiteDatabase db) {
         Log.d(TAG, "Creating a set of default clubs");
         ContentValues values = new ContentValues();
         values.put(Club.TYPE, Club.ClubType.Driver.name());
@@ -191,7 +220,8 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public final void onUpgrade(final SQLiteDatabase db,
+    		final int oldVersion, final int newVersion) {
         Log.w(TAG, "Upgrading from " + oldVersion + " to " + newVersion);
         db.execSQL("DROP TABLE IF EXISTS " + Shot.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + Round.TABLE_NAME);
