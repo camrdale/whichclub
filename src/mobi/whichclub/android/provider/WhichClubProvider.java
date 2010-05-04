@@ -30,7 +30,7 @@ public class WhichClubProvider extends ContentProvider {
 
     private static HashMap<String, String> sCourseProjectionMap;
 
-    private static final String AUTHORITY = "mobi.whichclub.android.data";
+    public static final String AUTHORITY = "mobi.whichclub.android.data";
     private static final int COURSES = 1;
     private static final int COURSE_ID = 2;
 
@@ -43,7 +43,7 @@ public class WhichClubProvider extends ContentProvider {
         mOpenHelper = new DbHelper(getContext());
         return true;
     }
-
+    
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
             String sortOrder) {
@@ -146,7 +146,11 @@ public class WhichClubProvider extends ContentProvider {
         int count;
         switch (sUriMatcher.match(uri)) {
         case COURSES:
-            count = db.delete(Course.TABLE_NAME, where, whereArgs);
+        	if (where == null || where.length() == 0) {
+        		count = db.delete(Course.TABLE_NAME, "1", whereArgs);
+        	} else {
+        		count = db.delete(Course.TABLE_NAME, where, whereArgs);
+        	}
             break;
 
         case COURSE_ID:
