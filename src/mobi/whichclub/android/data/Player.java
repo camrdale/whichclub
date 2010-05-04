@@ -3,8 +3,6 @@
  */
 package mobi.whichclub.android.data;
 
-import java.util.Set;
-
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -24,39 +22,4 @@ public class Player implements BaseColumns {
 
     public static final String NAME = "name";
     
-    private String name;
-    
-    private Set<Round> rounds;
-
-    /**
-     * 
-     */
-    public Player() {
-        super();
-    }
-
-    /**
-     * @param name
-     */
-    public Player(final String name) {
-        super();
-        this.name = name;
-    }
-
-    public final String getName() {
-        return name;
-    }
-
-    public final void setName(final String name) {
-        this.name = name;
-    }
-
-    public final Set<Round> getRounds() {
-        return rounds;
-    }
-
-    public final void setRounds(final Set<Round> rounds) {
-        this.rounds = rounds;
-    }
-
 }

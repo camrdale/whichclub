@@ -28,44 +28,4 @@ public class Location implements BaseColumns {
 
     public static final String LONGITUDE = "longitude";
     
-    private Hole hole;
-    
-    private String description;
-    
-    private Double latitude;
-    
-    private Double longitude;
-
-    public final Hole getHole() {
-        return hole;
-    }
-
-    public final void setHole(Hole hole) {
-        this.hole = hole;
-    }
-
-    public final String getDescription() {
-        return description;
-    }
-
-    public final void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public final Double getLatitude() {
-        return latitude;
-    }
-
-    public final void setLatitude(final Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public final Double getLongitude() {
-        return longitude;
-    }
-
-    public final void setLongitude(final Double longitude) {
-        this.longitude = longitude;
-    }
-
 }

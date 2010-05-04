@@ -47,7 +47,6 @@ public class StartRound extends Activity {
         
         Course course = (Course) ((Spinner) findViewById(R.id.CourseName)).getSelectedItem();
         Player player = (Player) ((Spinner) findViewById(R.id.PersonChooser)).getSelectedItem();
-        Round round = new Round(course, player, new Date());
         Long roundId = null;
         i.putExtra(Round.class.getCanonicalName(), roundId);
         startActivity(i);
