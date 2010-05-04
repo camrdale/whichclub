@@ -36,6 +36,11 @@ public class DbHelper extends SQLiteOpenHelper {
         return context.getDatabasePath(DATABASE_FILENAME);
     }
 
+    public static final boolean deleteDatabase(Context context) {
+    	Log.w(TAG, "Deleting the database: " + getDatabaseFile(context));
+    	return context.deleteDatabase(DATABASE_FILENAME);
+    }
+
     /**
      * @param context
      */
@@ -45,13 +50,13 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.i(TAG, "Creating a new database");
+        Log.i(TAG, "Creating a new database: " + db.getPath());
         db.execSQL("CREATE TABLE " + Player.TABLE_NAME + " ("
-                + Player._ID + " INTEGER PRIMARY KEY,"
+                + Player._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + Player.NAME + " TEXT"
                 + ");");
         db.execSQL("CREATE TABLE " + Course.TABLE_NAME + " ("
-                + Course._ID + " INTEGER PRIMARY KEY,"
+                + Course._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + Course.CITY + " TEXT,"
                 + Course.COUNTRY + " TEXT,"
                 + Course.LATITUDE + " REAL,"
@@ -61,12 +66,12 @@ public class DbHelper extends SQLiteOpenHelper {
                 + Course.STATE_PROV + " TEXT"
                 + ");");
         db.execSQL("CREATE TABLE " + Ball.TABLE_NAME + " ("
-                + Ball._ID + " INTEGER PRIMARY KEY,"
+                + Ball._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + Ball.MANUFACTURER + " TEXT,"
                 + Ball.MODEL + " TEXT"
                 + ");");
         db.execSQL("CREATE TABLE " + Club.TABLE_NAME + " ("
-                + Club._ID + " INTEGER PRIMARY KEY,"
+                + Club._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + Club.DESCRIPTION + " TEXT,"
                 + Club.MANUFACTURER + " TEXT,"
                 + Club.MODEL + " TEXT,"
@@ -74,21 +79,21 @@ public class DbHelper extends SQLiteOpenHelper {
                 + Club.TYPE + " TEXT"
                 + ");");
         db.execSQL("CREATE TABLE " + Hole.TABLE_NAME + " ("
-                + Hole._ID + " INTEGER PRIMARY KEY,"
+                + Hole._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + Hole.COURSE + " INTEGER,"
                 + Hole.HANDICAP + " INTEGER,"
                 + Hole.NUMBER + " INTEGER,"
                 + Hole.PAR + " INTEGER"
                 + ");");
         db.execSQL("CREATE TABLE " + Location.TABLE_NAME + " ("
-                + Location._ID + " INTEGER PRIMARY KEY,"
+                + Location._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + Location.DESCRIPTION + " TEXT,"
                 + Location.HOLE + " INTEGER,"
                 + Location.LATITUDE + " REAL,"
                 + Location.LONGITUDE + " REAL"
                 + ");");
         db.execSQL("CREATE TABLE " + Round.TABLE_NAME + " ("
-                + Round._ID + " INTEGER PRIMARY KEY,"
+                + Round._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + Round.COURSE + " INTEGER,"
                 + Round.DATE + " INTEGER,"
                 + Round.GIR + " INTEGER,"
@@ -96,7 +101,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 + Round.SCORE + " INTEGER"
                 + ");");
         db.execSQL("CREATE TABLE " + Shot.TABLE_NAME + " ("
-                + Shot._ID + " INTEGER PRIMARY KEY,"
+                + Shot._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + Shot.BALL + " INTEGER,"
                 + Shot.CLUB + " INTEGER,"
                 + Shot.DISTANCE + " REAL,"

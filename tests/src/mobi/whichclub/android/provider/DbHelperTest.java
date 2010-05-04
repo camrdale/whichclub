@@ -3,7 +3,6 @@
  */
 package mobi.whichclub.android.provider;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +21,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.LargeTest;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
@@ -35,29 +35,16 @@ public class DbHelperTest extends AndroidTestCase {
     private DbHelper helper;
     private SQLiteDatabase db;
     
-    public void deleteDatabase() {
-        File databaseFile = DbHelper.getDatabaseFile(getContext());
-        Log.d(TAG, "Attempting to delete database: " + databaseFile);
-        if (databaseFile.exists()) {
-            if (databaseFile.delete()) {
-                Log.i(TAG, "Deleted the database: " + databaseFile);
-            } else {
-                Log.w(TAG, "Failed to delete the database: " + databaseFile);
-            }
-        }
-    }
-
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        deleteDatabase();
+        DbHelper.deleteDatabase(getContext());
         helper = new DbHelper(getContext());
         db = helper.getWritableDatabase();
     }
 
     @Override
     protected void tearDown() throws Exception {
-        Log.w(TAG, "tearDown");
         if (db != null) {
             db.close();
             db = null;
@@ -66,16 +53,21 @@ public class DbHelperTest extends AndroidTestCase {
             helper.close();
             helper = null;
         }
-        deleteDatabase();
+        if (DbHelper.deleteDatabase(getContext())) {
+        	Log.d(TAG, "Deleted the database");
+        } else {
+        	Log.d(TAG, "Failed to delete the database");
+        }
         super.tearDown();
     }
 
     @SmallTest
     public void testOpenDatabase() {
-        Log.w(TAG, "Opening the database");
+    	assertNotNull(helper);
+    	assertNotNull(db);
     }
 
-    @SmallTest
+    @LargeTest
     public void testPerformance() {
         long startTime = System.nanoTime();
         Random rand = new Random();
