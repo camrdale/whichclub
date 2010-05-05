@@ -1021,4 +1021,80 @@ public final class WhichClubProviderTest
         cursor.close();
     }
 
+    /**
+     * Test querying for all of a course's rounds.
+     */
+    @SmallTest
+    public void testQueryRoundsByCourse() {
+        long courseId = getDefaultCourseId();
+        
+        ContentValues values = new ContentValues();
+        values.put(Course.NAME, "NewCourse");
+        Uri result = getMockContentResolver().insert(Course.CONTENT_URI, values);
+        long otherCourseId = Long.valueOf(result.getPathSegments().get(1));
+
+        values.clear();
+        values.put(Round.SCORE, 72);
+        getMockContentResolver().insert(Round.CONTENT_URI, values);
+        values.put(Round.SCORE, 73);
+        values.put(Round.COURSE, courseId);
+        getMockContentResolver().insert(Round.CONTENT_URI, values);
+        values.put(Round.SCORE, 74);
+        values.put(Round.COURSE, otherCourseId);
+        getMockContentResolver().insert(Round.CONTENT_URI, values);
+
+        result = ContentUris.withAppendedId(Course.CONTENT_URI, courseId);
+        result = Uri.withAppendedPath(result, Round.TABLE_NAME);
+        Cursor cursor = getMockContentResolver().query(result,
+                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+        assertNotNull(cursor);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Log.d(TAG, "Found round: " + cursor.getInt(3));
+            assertEquals(73, cursor.getInt(3));
+            cursor.moveToNext();
+        }
+        Log.d(TAG, "Found " + cursor.getCount() + " rounds");
+        assertEquals(1, cursor.getCount());
+        cursor.close();
+    }
+
+    /**
+     * Test querying for all of a player's rounds.
+     */
+    @SmallTest
+    public void testQueryRoundsByPlayer() {
+        long playerId = getDefaultPlayerId();
+        
+        ContentValues values = new ContentValues();
+        values.put(Player.NAME, "NewPlayer");
+        Uri result = getMockContentResolver().insert(Player.CONTENT_URI, values);
+        long otherPlayerId = Long.valueOf(result.getPathSegments().get(1));
+
+        values.clear();
+        values.put(Round.SCORE, 72);
+        getMockContentResolver().insert(Round.CONTENT_URI, values);
+        values.put(Round.SCORE, 73);
+        values.put(Round.PLAYER, playerId);
+        getMockContentResolver().insert(Round.CONTENT_URI, values);
+        values.put(Round.SCORE, 74);
+        values.put(Round.PLAYER, otherPlayerId);
+        getMockContentResolver().insert(Round.CONTENT_URI, values);
+
+        result = ContentUris.withAppendedId(Player.CONTENT_URI, playerId);
+        result = Uri.withAppendedPath(result, Round.TABLE_NAME);
+        Cursor cursor = getMockContentResolver().query(result,
+                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+        assertNotNull(cursor);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Log.d(TAG, "Found round: " + cursor.getInt(3));
+            assertEquals(73, cursor.getInt(3));
+            cursor.moveToNext();
+        }
+        Log.d(TAG, "Found " + cursor.getCount() + " rounds");
+        assertEquals(1, cursor.getCount());
+        cursor.close();
+    }
+
 }

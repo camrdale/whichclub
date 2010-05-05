@@ -40,6 +40,10 @@ public class WhichClubProvider extends ContentProvider {
     private static final int ROUNDS = 5;
     /** URI matching results. */
     private static final int ROUND_ID = 6;
+    /** URI matching results. */
+    private static final int ROUNDS_FOR_COURSE_ID = 7;
+    /** URI matching results. */
+    private static final int ROUNDS_FOR_PLAYER_ID = 8;
     /** URI matcher. */
     private static final UriMatcher URI_MATCHER;
     /** The database helper to use to open it. */
@@ -97,6 +101,20 @@ public class WhichClubProvider extends ContentProvider {
             orderBy = getOrderBy(sortOrder, Round.DEFAULT_SORT_ORDER);
             break;
 
+        case ROUNDS_FOR_COURSE_ID:
+            qb.appendWhere(Round.COURSE + "=" + uri.getPathSegments().get(1));
+            qb.setTables(Round.TABLE_NAME);
+            qb.setProjectionMap(Round.PROJECTION_MAP);
+            orderBy = getOrderBy(sortOrder, Round.DEFAULT_SORT_ORDER);
+            break;
+
+        case ROUNDS_FOR_PLAYER_ID:
+            qb.appendWhere(Round.PLAYER + "=" + uri.getPathSegments().get(1));
+            qb.setTables(Round.TABLE_NAME);
+            qb.setProjectionMap(Round.PROJECTION_MAP);
+            orderBy = getOrderBy(sortOrder, Round.DEFAULT_SORT_ORDER);
+            break;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -127,6 +145,8 @@ public class WhichClubProvider extends ContentProvider {
             return Player.CONTENT_ITEM_TYPE;
 
         case ROUNDS:
+        case ROUNDS_FOR_COURSE_ID:
+        case ROUNDS_FOR_PLAYER_ID:
             return Round.CONTENT_MULTI_TYPE;
 
         case ROUND_ID:
@@ -298,5 +318,7 @@ public class WhichClubProvider extends ContentProvider {
         URI_MATCHER.addURI(AUTHORITY, Player.TABLE_NAME + "/#", PLAYER_ID);
         URI_MATCHER.addURI(AUTHORITY, Round.TABLE_NAME, ROUNDS);
         URI_MATCHER.addURI(AUTHORITY, Round.TABLE_NAME + "/#", ROUND_ID);
+        URI_MATCHER.addURI(AUTHORITY, Course.TABLE_NAME + "/#/" + Round.TABLE_NAME, ROUNDS_FOR_COURSE_ID);
+        URI_MATCHER.addURI(AUTHORITY, Player.TABLE_NAME + "/#/" + Round.TABLE_NAME, ROUNDS_FOR_PLAYER_ID);
     }
 }
