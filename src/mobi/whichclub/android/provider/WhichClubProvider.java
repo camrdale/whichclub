@@ -14,6 +14,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import mobi.whichclub.android.data.Course;
+import mobi.whichclub.android.data.Player;
+import mobi.whichclub.android.data.Round;
 
 /**
  * Provides access to the WhichClub database of shots.
@@ -30,6 +32,14 @@ public class WhichClubProvider extends ContentProvider {
     private static final int COURSES = 1;
     /** URI matching results. */
     private static final int COURSE_ID = 2;
+    /** URI matching results. */
+    private static final int PLAYERS = 3;
+    /** URI matching results. */
+    private static final int PLAYER_ID = 4;
+    /** URI matching results. */
+    private static final int ROUNDS = 5;
+    /** URI matching results. */
+    private static final int ROUND_ID = 6;
     /** URI matcher. */
     private static final UriMatcher URI_MATCHER;
     /** The database helper to use to open it. */
@@ -49,7 +59,7 @@ public class WhichClubProvider extends ContentProvider {
      */
     private String getOrderBy(final String sortOrder, final String defaultSortOrder) {
         if (TextUtils.isEmpty(sortOrder)) {
-            return Course.DEFAULT_SORT_ORDER;
+            return defaultSortOrder;
         } else {
             return sortOrder;
         }
@@ -60,15 +70,31 @@ public class WhichClubProvider extends ContentProvider {
     		final String selection, final String[] selectionArgs,
             final String sortOrder) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(Course.TABLE_NAME);
         String orderBy;
 
         switch (URI_MATCHER.match(uri)) {
         case COURSE_ID:
             qb.appendWhere(Course._ID + "=" + uri.getPathSegments().get(1));
         case COURSES:
+            qb.setTables(Course.TABLE_NAME);
             qb.setProjectionMap(Course.PROJECTION_MAP);
             orderBy = getOrderBy(sortOrder, Course.DEFAULT_SORT_ORDER);
+            break;
+
+        case PLAYER_ID:
+            qb.appendWhere(Player._ID + "=" + uri.getPathSegments().get(1));
+        case PLAYERS:
+            qb.setTables(Player.TABLE_NAME);
+            qb.setProjectionMap(Player.PROJECTION_MAP);
+            orderBy = getOrderBy(sortOrder, Player.DEFAULT_SORT_ORDER);
+            break;
+
+        case ROUND_ID:
+            qb.appendWhere(Round._ID + "=" + uri.getPathSegments().get(1));
+        case ROUNDS:
+            qb.setTables(Round.TABLE_NAME);
+            qb.setProjectionMap(Round.PROJECTION_MAP);
+            orderBy = getOrderBy(sortOrder, Round.DEFAULT_SORT_ORDER);
             break;
 
         default:
@@ -94,6 +120,18 @@ public class WhichClubProvider extends ContentProvider {
         case COURSE_ID:
             return Course.CONTENT_ITEM_TYPE;
 
+        case PLAYERS:
+            return Player.CONTENT_MULTI_TYPE;
+
+        case PLAYER_ID:
+            return Player.CONTENT_ITEM_TYPE;
+
+        case ROUNDS:
+            return Round.CONTENT_MULTI_TYPE;
+
+        case ROUND_ID:
+            return Round.CONTENT_ITEM_TYPE;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -102,14 +140,9 @@ public class WhichClubProvider extends ContentProvider {
     @Override
     public final Uri insert(final Uri uri, final ContentValues initialValues) {
     	Log.d(TAG, "Inserting " + uri + ": " + initialValues.toString());
-
-        // Validate the requested uri
-        if (URI_MATCHER.match(uri) != COURSES) {
-            throw new IllegalArgumentException("Unknown URI " + uri);
-        }
-        
-        Log.d(TAG, "Inserting URI: " + uri);
-
+    	
+    	String table;
+    	String nullColumnHack;
         ContentValues values;
         if (initialValues != null) {
             values = new ContentValues(initialValues);
@@ -117,32 +150,35 @@ public class WhichClubProvider extends ContentProvider {
             values = new ContentValues();
         }
 
-//        Long now = Long.valueOf(System.currentTimeMillis());
+        // Validate the requested uri
+        switch (URI_MATCHER.match(uri)) {
+        case COURSES:
+        	table = Course.TABLE_NAME;
+        	nullColumnHack = Course.NAME;
+            break;
 
-        // Make sure that the fields are all set
-//        if (values.containsKey(NotePad.Notes.CREATED_DATE) == false) {
-//            values.put(NotePad.Notes.CREATED_DATE, now);
-//        }
-//
-//        if (values.containsKey(NotePad.Notes.MODIFIED_DATE) == false) {
-//            values.put(NotePad.Notes.MODIFIED_DATE, now);
-//        }
-//
-//        if (values.containsKey(NotePad.Notes.TITLE) == false) {
-//            Resources r = Resources.getSystem();
-//            values.put(NotePad.Notes.TITLE,
-//        			r.getString(android.R.string.untitled));
-//        }
-//
-//        if (values.containsKey(NotePad.Notes.NOTE) == false) {
-//            values.put(NotePad.Notes.NOTE, "");
-//        }
+        case PLAYERS:
+        	table = Player.TABLE_NAME;
+        	nullColumnHack = Player.NAME;
+            break;
 
+        case ROUNDS:
+        	table = Round.TABLE_NAME;
+        	nullColumnHack = Round.SCORE;
+            if (!values.containsKey(Round.DATE)) {
+            	values.put(Round.DATE, System.currentTimeMillis());
+            }
+            break;
+
+        default:
+            throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+        
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        long rowId = db.insert(Course.TABLE_NAME, Course.NAME, values);
-        if (rowId > 0) {
+        long rowId = db.insert(table, nullColumnHack, values);
+        if (rowId >= 0) {
             Uri courseUri =
-            	ContentUris.withAppendedId(Course.CONTENT_URI, rowId);
+            	ContentUris.withAppendedId(uri, rowId);
             getContext().getContentResolver().notifyChange(courseUri, null);
             return courseUri;
         }
@@ -156,7 +192,11 @@ public class WhichClubProvider extends ContentProvider {
      * @param where the user supplied where clause
      * @return the new where clause, including the record ID
      */
-    private String buildWhereWithId(final String id, final String where) {
+    private String whereWithId(final String id, final String where) {
+    	if (id == null) {
+    		return where;
+    	}
+
     	// All _ID's come from BaseColumns, so use Course for any table
         String whereWithId = Course._ID + "=" + id;
         if (!TextUtils.isEmpty(where)) {
@@ -171,26 +211,41 @@ public class WhichClubProvider extends ContentProvider {
     	Log.d(TAG, "Deleting " + uri + " where "
     			+ where + "[" + whereArgs + "]");
     	
-        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        int count;
+    	String table;
+    	String recordId = null;
+    	
         switch (URI_MATCHER.match(uri)) {
+        case COURSE_ID:
+        	recordId = uri.getPathSegments().get(1);
         case COURSES:
-        	if (TextUtils.isEmpty(where)) {
-        		count = db.delete(Course.TABLE_NAME, "1", whereArgs);
-        	} else {
-        		count = db.delete(Course.TABLE_NAME, where, whereArgs);
-        	}
+        	table = Course.TABLE_NAME;
             break;
 
-        case COURSE_ID:
-            String courseId = uri.getPathSegments().get(1);
-            count = db.delete(Course.TABLE_NAME, buildWhereWithId(courseId, where), whereArgs);
+        case PLAYER_ID:
+        	recordId = uri.getPathSegments().get(1);
+        case PLAYERS:
+        	table = Player.TABLE_NAME;
+            break;
+
+        case ROUND_ID:
+        	recordId = uri.getPathSegments().get(1);
+        case ROUNDS:
+        	table = Round.TABLE_NAME;
             break;
 
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
 
+        // Make sure the WHERE clause is non-empty, or the record count won't work
+        String nonEmptyWhere = where;
+    	if (TextUtils.isEmpty(nonEmptyWhere)) {
+    		nonEmptyWhere = "1";
+    	}
+
+    	SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+    	int count = db.delete(table, whereWithId(recordId, nonEmptyWhere), whereArgs);
+        
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
     }
@@ -201,23 +256,36 @@ public class WhichClubProvider extends ContentProvider {
     	Log.d(TAG, "Updating " + uri + " where "
     			+ where + "[" + whereArgs + "]");
 
-    	SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        int count;
+    	String table;
+    	String recordId = null;
+    	
         switch (URI_MATCHER.match(uri)) {
+        case COURSE_ID:
+            recordId = uri.getPathSegments().get(1);
         case COURSES:
-            count = db.update(Course.TABLE_NAME, values, where, whereArgs);
+        	table = Course.TABLE_NAME;
             break;
 
-        case COURSE_ID:
-            String courseId = uri.getPathSegments().get(1);
-            count = db.update(Course.TABLE_NAME, values,
-            		buildWhereWithId(courseId, where), whereArgs);
+        case PLAYER_ID:
+            recordId = uri.getPathSegments().get(1);
+        case PLAYERS:
+        	table = Player.TABLE_NAME;
+            break;
+
+        case ROUND_ID:
+            recordId = uri.getPathSegments().get(1);
+        case ROUNDS:
+        	table = Round.TABLE_NAME;
             break;
 
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
 
+    	SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        int count = db.update(table, values,
+        		whereWithId(recordId, where), whereArgs);
+        
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
     }
@@ -226,5 +294,9 @@ public class WhichClubProvider extends ContentProvider {
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
         URI_MATCHER.addURI(AUTHORITY, Course.TABLE_NAME, COURSES);
         URI_MATCHER.addURI(AUTHORITY, Course.TABLE_NAME + "/#", COURSE_ID);
+        URI_MATCHER.addURI(AUTHORITY, Player.TABLE_NAME, PLAYERS);
+        URI_MATCHER.addURI(AUTHORITY, Player.TABLE_NAME + "/#", PLAYER_ID);
+        URI_MATCHER.addURI(AUTHORITY, Round.TABLE_NAME, ROUNDS);
+        URI_MATCHER.addURI(AUTHORITY, Round.TABLE_NAME + "/#", ROUND_ID);
     }
 }
