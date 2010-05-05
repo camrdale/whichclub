@@ -106,7 +106,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 + Round.COURSE + " INTEGER,"
                 + Round.DATE + " INTEGER,"
                 + Round.GIR + " INTEGER,"
-                + Round.PLAYER + " INTEGER"
+                + Round.PLAYER + " INTEGER,"
                 + Round.SCORE + " INTEGER"
                 + ");");
         db.execSQL("CREATE TABLE " + Shot.TABLE_NAME + " ("
