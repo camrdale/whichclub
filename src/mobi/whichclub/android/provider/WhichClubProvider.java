@@ -41,33 +41,38 @@ public class WhichClubProvider extends ContentProvider {
         return true;
     }
     
+    /**
+     * If no sort order is specified use the default.
+     * @param sortOrder the user supplied sort order
+     * @param defaultSortOrder the default sort order
+     * @return the sort order to use
+     */
+    private String getOrderBy(final String sortOrder, final String defaultSortOrder) {
+        if (TextUtils.isEmpty(sortOrder)) {
+            return Course.DEFAULT_SORT_ORDER;
+        } else {
+            return sortOrder;
+        }
+    }
+    
     @Override
     public final Cursor query(final Uri uri, final String[] projection,
     		final String selection, final String[] selectionArgs,
             final String sortOrder) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(Course.TABLE_NAME);
+        String orderBy;
 
         switch (URI_MATCHER.match(uri)) {
+        case COURSE_ID:
+            qb.appendWhere(Course._ID + "=" + uri.getPathSegments().get(1));
         case COURSES:
             qb.setProjectionMap(Course.PROJECTION_MAP);
-            break;
-
-        case COURSE_ID:
-            qb.setProjectionMap(Course.PROJECTION_MAP);
-            qb.appendWhere(Course._ID + "=" + uri.getPathSegments().get(1));
+            orderBy = getOrderBy(sortOrder, Course.DEFAULT_SORT_ORDER);
             break;
 
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
-        }
-
-        // If no sort order is specified use the default
-        String orderBy;
-        if (TextUtils.isEmpty(sortOrder)) {
-            orderBy = Course.DEFAULT_SORT_ORDER;
-        } else {
-            orderBy = sortOrder;
         }
 
         // Get the database and run the query
@@ -145,6 +150,21 @@ public class WhichClubProvider extends ContentProvider {
         throw new SQLException("Failed to insert row into " + uri);
     }
 
+    /**
+     * Build the where clause, including selection by record ID.
+     * @param id the ID of the record to select
+     * @param where the user supplied where clause
+     * @return the new where clause, including the record ID
+     */
+    private String buildWhereWithId(final String id, final String where) {
+    	// All _ID's come from BaseColumns, so use Course for any table
+        String whereWithId = Course._ID + "=" + id;
+        if (!TextUtils.isEmpty(where)) {
+        	whereWithId += " AND (" + where + ')';
+        }
+        return whereWithId;
+    }
+    
     @Override
     public final int delete(final Uri uri,
     		final String where, final String[] whereArgs) {
@@ -155,7 +175,7 @@ public class WhichClubProvider extends ContentProvider {
         int count;
         switch (URI_MATCHER.match(uri)) {
         case COURSES:
-        	if (where == null || where.length() == 0) {
+        	if (TextUtils.isEmpty(where)) {
         		count = db.delete(Course.TABLE_NAME, "1", whereArgs);
         	} else {
         		count = db.delete(Course.TABLE_NAME, where, whereArgs);
@@ -164,11 +184,7 @@ public class WhichClubProvider extends ContentProvider {
 
         case COURSE_ID:
             String courseId = uri.getPathSegments().get(1);
-            String whereWithId = Course._ID + "=" + courseId;
-            if (!TextUtils.isEmpty(where)) {
-            	whereWithId += " AND (" + where + ')';
-            }
-            count = db.delete(Course.TABLE_NAME, whereWithId, whereArgs);
+            count = db.delete(Course.TABLE_NAME, buildWhereWithId(courseId, where), whereArgs);
             break;
 
         default:
@@ -194,12 +210,8 @@ public class WhichClubProvider extends ContentProvider {
 
         case COURSE_ID:
             String courseId = uri.getPathSegments().get(1);
-            String whereWithId = Course._ID + "=" + courseId;
-            if (!TextUtils.isEmpty(where)) {
-            	whereWithId += " AND (" + where + ')';
-            }
             count = db.update(Course.TABLE_NAME, values,
-            		whereWithId, whereArgs);
+            		buildWhereWithId(courseId, where), whereArgs);
             break;
 
         default:
