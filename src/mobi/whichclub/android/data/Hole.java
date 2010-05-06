@@ -43,9 +43,10 @@ public class Hole implements BaseColumns {
     /** A default column projection to get all the columns. */
     public static final String[] PROJECTION = new String[] {
         _ID, // 0
-        NUMBER, // 1
-        PAR, // 2
-        HANDICAP // 3
+        COURSE, // 1
+        NUMBER, // 2
+        PAR, // 3
+        HANDICAP // 4
     };
     
     /** A default column projection map to get all the columns. */
@@ -53,10 +54,11 @@ public class Hole implements BaseColumns {
 		new HashMap<String, String>();
     
     static {
-        PROJECTION_MAP.put(_ID, _ID);
-        PROJECTION_MAP.put(NUMBER, NUMBER);
-        PROJECTION_MAP.put(PAR, PAR);
-        PROJECTION_MAP.put(HANDICAP, HANDICAP);
+        PROJECTION_MAP.put(_ID, TABLE_NAME + "." + _ID);
+        PROJECTION_MAP.put(COURSE, TABLE_NAME + "." + COURSE);
+        PROJECTION_MAP.put(NUMBER, TABLE_NAME + "." + NUMBER);
+        PROJECTION_MAP.put(PAR, TABLE_NAME + "." + PAR);
+        PROJECTION_MAP.put(HANDICAP, TABLE_NAME + "." + HANDICAP);
     }
 
     /** Protected default constructor for utility class. */

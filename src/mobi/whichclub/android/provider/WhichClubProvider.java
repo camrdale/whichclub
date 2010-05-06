@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import mobi.whichclub.android.data.Course;
+import mobi.whichclub.android.data.Hole;
 import mobi.whichclub.android.data.Player;
 import mobi.whichclub.android.data.Round;
 
@@ -44,6 +45,10 @@ public class WhichClubProvider extends ContentProvider {
     private static final int ROUNDS_FOR_COURSE_ID = 7;
     /** URI matching results. */
     private static final int ROUNDS_FOR_PLAYER_ID = 8;
+    /** URI matching results. */
+    private static final int HOLES_FOR_COURSE_ID = 9;
+    /** URI matching results. */
+    private static final int HOLES_FOR_ROUND_ID = 10;
     /** URI matcher. */
     private static final UriMatcher URI_MATCHER;
     /** The database helper to use to open it. */
@@ -113,6 +118,21 @@ public class WhichClubProvider extends ContentProvider {
             qb.setTables(Round.TABLE_NAME);
             qb.setProjectionMap(Round.PROJECTION_MAP);
             orderBy = getOrderBy(sortOrder, Round.DEFAULT_SORT_ORDER);
+            break;
+
+        case HOLES_FOR_COURSE_ID:
+            qb.appendWhere(Hole.COURSE + "=" + uri.getPathSegments().get(1));
+            qb.setTables(Hole.TABLE_NAME);
+            qb.setProjectionMap(Hole.PROJECTION_MAP);
+            orderBy = getOrderBy(sortOrder, Hole.DEFAULT_SORT_ORDER);
+            break;
+
+        case HOLES_FOR_ROUND_ID:
+            qb.setProjectionMap(Hole.PROJECTION_MAP);
+            qb.setTables(Hole.TABLE_NAME + " JOIN " + Round.TABLE_NAME + " ON("
+                    + Hole.TABLE_NAME + "." + Hole.COURSE + "=" + Round.TABLE_NAME + "." + Round.COURSE + ")");
+            qb.appendWhere(Round.TABLE_NAME + "." + Round._ID + "=" + uri.getPathSegments().get(1));
+            orderBy = getOrderBy(sortOrder, Hole.TABLE_NAME + "." + Hole.NUMBER + " ASC");
             break;
 
         default:
@@ -320,5 +340,7 @@ public class WhichClubProvider extends ContentProvider {
         URI_MATCHER.addURI(AUTHORITY, Round.TABLE_NAME + "/#", ROUND_ID);
         URI_MATCHER.addURI(AUTHORITY, Course.TABLE_NAME + "/#/" + Round.TABLE_NAME, ROUNDS_FOR_COURSE_ID);
         URI_MATCHER.addURI(AUTHORITY, Player.TABLE_NAME + "/#/" + Round.TABLE_NAME, ROUNDS_FOR_PLAYER_ID);
+        URI_MATCHER.addURI(AUTHORITY, Course.TABLE_NAME + "/#/" + Hole.TABLE_NAME, HOLES_FOR_COURSE_ID);
+        URI_MATCHER.addURI(AUTHORITY, Round.TABLE_NAME + "/#/" + Hole.TABLE_NAME, HOLES_FOR_ROUND_ID);
     }
 }

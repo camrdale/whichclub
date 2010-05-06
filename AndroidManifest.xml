@@ -13,6 +13,7 @@
         </activity>
 
 	    <activity android:name="StartRound"></activity>
+        <activity android:name="SelectHole"></activity>
 	
 		<provider
 		    android:name=".provider.WhichClubProvider"

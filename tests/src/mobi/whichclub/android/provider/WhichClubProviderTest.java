@@ -1,6 +1,7 @@
 package mobi.whichclub.android.provider;
 
 import mobi.whichclub.android.data.Course;
+import mobi.whichclub.android.data.Hole;
 import mobi.whichclub.android.data.Player;
 import mobi.whichclub.android.data.Round;
 
@@ -1094,6 +1095,45 @@ public final class WhichClubProviderTest
         }
         Log.d(TAG, "Found " + cursor.getCount() + " rounds");
         assertEquals(1, cursor.getCount());
+        cursor.close();
+    }
+
+    /**
+     * Test querying for all of a course's rounds.
+     */
+    @SmallTest
+    public void testQueryHolesByRound() {
+        long courseId = getDefaultCourseId();
+        
+        ContentValues values = new ContentValues();
+        values.put(Course.NAME, "NewCourse");
+        Uri result = getMockContentResolver().insert(Course.CONTENT_URI, values);
+        long otherCourseId = Long.valueOf(result.getPathSegments().get(1));
+
+        values.clear();
+        values.put(Round.SCORE, 72);
+        getMockContentResolver().insert(Round.CONTENT_URI, values);
+        values.put(Round.SCORE, 73);
+        values.put(Round.COURSE, courseId);
+        result = getMockContentResolver().insert(Round.CONTENT_URI, values);
+        long roundId = Long.parseLong(result.getPathSegments().get(1));
+        values.put(Round.SCORE, 74);
+        values.put(Round.COURSE, otherCourseId);
+        getMockContentResolver().insert(Round.CONTENT_URI, values);
+
+        result = ContentUris.withAppendedId(Round.CONTENT_URI, roundId);
+        result = Uri.withAppendedPath(result, Hole.TABLE_NAME);
+        Cursor cursor = getMockContentResolver().query(result,
+                Hole.PROJECTION, null, null, Hole.DEFAULT_SORT_ORDER);
+        assertNotNull(cursor);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Log.d(TAG, "Found hole: " + cursor.getInt(2));
+            assertEquals(courseId, cursor.getInt(1));
+            cursor.moveToNext();
+        }
+        Log.d(TAG, "Found " + cursor.getCount() + " holes");
+        assertEquals(18, cursor.getCount());
         cursor.close();
     }
 

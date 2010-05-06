@@ -8,4 +8,19 @@
     <string name="Start">Start</string>
     <string name="UnderConstruction">Under Construction</string>
     <string name="LoadingStats">Loading Statistics ...</string>
+    <string name="BeginTeeShot">Start Tee Shot</string>
+    <string name="Par">Par</string>
+    <string name="Handicap">Handicap</string>
+    <string name="Distance">Distance</string>
+    <string name="Next">Next</string>
+    <string name="Prev">Prev</string>
+    <string name="SelectHole">Select Hole</string>
+    <string name="Unknown">Unknown</string>
+    <string name="HoleNumber">Hole #</string>
+
+    <string-array name="Pars">
+        <item>"3"</item>
+        <item>"4"</item>
+        <item>"5"</item>
+    </string-array>
 </resources>
