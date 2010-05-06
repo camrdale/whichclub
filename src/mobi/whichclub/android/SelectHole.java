@@ -94,14 +94,13 @@ public class SelectHole extends Activity {
 
         final Intent intent = getIntent();
 
-        // Do some setup based on the action being performed.
-        Uri mUri = intent.getData();
+        Uri uri = intent.getData();
         
-        // If we were unable to create a new note, then just finish
+        // If we were unable to create a new round, then just finish
         // this activity.  A RESULT_CANCELED will be sent back to the
         // original activity if they requested a result.
-        if (mUri == null) {
-            Log.e(TAG, "Failed to insert new note into " + getIntent().getData());
+        if (uri == null) {
+            Log.e(TAG, "Failed to insert new round into " + getIntent().getData());
             finish();
             return;
         }
@@ -109,20 +108,20 @@ public class SelectHole extends Activity {
         // Inflate our UI from its XML layout description.
         setContentView(R.layout.select_hole);
         
-        // Hook up button presses to the appropriate event handler.
+        // Hook up button presses to the appropriate event handlers.
         ((Button) findViewById(R.id.Prev)).setOnClickListener(mPrevHoleListener);
         ((Button) findViewById(R.id.Next)).setOnClickListener(mNextHoleListener);
         ((Spinner) findViewById(R.id.ParChooser)).setOnItemSelectedListener(mParChosenListener);
 
-        // The text view for our note, identified by its ID in the XML file.
+        // The state for the hole.
         holeText = (TextView) findViewById(R.id.HoleNumber);
         parText = (TextView) findViewById(R.id.Par);
 
-        // Get the note!
-        cursor = managedQuery(mUri, HOLE_PROJECTION, null, null, Hole.NUMBER + " ASC");
+        // Get the data for all this round's holes.
+        cursor = managedQuery(uri, HOLE_PROJECTION, null, null, Hole.NUMBER + " ASC");
 
         // If an instance of this activity had previously stopped, we can
-        // get the original text it started with.
+        // get the original position it was at.
         if (savedInstanceState != null) {
             currentPosition = savedInstanceState.getInt(SAVED_POSITION);
         } else {
@@ -140,7 +139,7 @@ public class SelectHole extends Activity {
             updateState();
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("That feature has not yet been implemented.");
+            builder.setMessage("Failed to retrieve the data for the holes for this round.");
             builder.setCancelable(false);
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(final DialogInterface dialog, final int id) {
@@ -149,6 +148,7 @@ public class SelectHole extends Activity {
             });
             AlertDialog alert = builder.create();
             alert.show();
+            finish();
         }
     }
 
