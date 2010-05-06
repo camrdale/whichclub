@@ -12,14 +12,14 @@
             </intent-filter>
         </activity>
 
-	    <activity android:name="StartRound"></activity>
+        <activity android:name="StartRound"></activity>
         <activity android:name="SelectHole"></activity>
-	
-		<provider
-		    android:name=".provider.WhichClubProvider"
-		    android:authorities="mobi.whichclub.android.data"/>
-	    
-	</application>
+    
+        <provider
+            android:name=".provider.WhichClubProvider"
+            android:authorities="mobi.whichclub.android.data"/>
+        
+    </application>
     <uses-sdk android:minSdkVersion="7" />
 
 </manifest> 

@@ -21,15 +21,15 @@ public class Player implements BaseColumns {
     
     /** The content:// style URL for this table. */
     public static final Uri CONTENT_URI = Uri.parse(
-    		"content://" + WhichClubProvider.AUTHORITY + "/" + TABLE_NAME);
+            "content://" + WhichClubProvider.AUTHORITY + "/" + TABLE_NAME);
 
     /** The content type for multiple records from this table. */
     public static final String CONTENT_MULTI_TYPE =
-    	"vnd.android.cursor.dir/vnd.whichclub." + TABLE_NAME;
+        "vnd.android.cursor.dir/vnd.whichclub." + TABLE_NAME;
 
     /** The content type for a single record from this table. */
     public static final String CONTENT_ITEM_TYPE =
-    	"vnd.android.cursor.item/vnd.whichclub." + TABLE_NAME;
+        "vnd.android.cursor.item/vnd.whichclub." + TABLE_NAME;
 
     /** The default sort order for records returned from this table. */
     public static final String DEFAULT_SORT_ORDER = NAME + " ASC";
@@ -41,8 +41,8 @@ public class Player implements BaseColumns {
     };
     
     /** A default column projection map to get all the columns. */
-	public static final Map<String, String> PROJECTION_MAP =
-		new HashMap<String, String>();
+    public static final Map<String, String> PROJECTION_MAP =
+        new HashMap<String, String>();
     
     static {
         PROJECTION_MAP.put(_ID, _ID);

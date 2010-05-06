@@ -27,7 +27,7 @@ import android.util.Log;
  */
 public final class DbHelperTest extends AndroidTestCase {
     
-	/** Logging tag. */
+    /** Logging tag. */
     private static final String TAG = "DbHelperTest";
     /** The database helper. */
     private DbHelper helper;
@@ -53,9 +53,9 @@ public final class DbHelperTest extends AndroidTestCase {
             helper = null;
         }
         if (DbHelper.deleteDatabase(getContext())) {
-        	Log.d(TAG, "Deleted the database");
+            Log.d(TAG, "Deleted the database");
         } else {
-        	Log.d(TAG, "Failed to delete the database");
+            Log.d(TAG, "Failed to delete the database");
         }
         super.tearDown();
     }
@@ -65,8 +65,8 @@ public final class DbHelperTest extends AndroidTestCase {
      */
     @SmallTest
     public void testOpenDatabase() {
-    	assertNotNull(helper);
-    	assertNotNull(db);
+        assertNotNull(helper);
+        assertNotNull(db);
     }
 
     /**
@@ -78,25 +78,25 @@ public final class DbHelperTest extends AndroidTestCase {
         Random rand = new Random();
 
         Cursor cursor = db.query(Ball.TABLE_NAME, new String[] {Ball._ID},
-        		null, null, null, null, null);
+                null, null, null, null, null);
         cursor.moveToFirst();
         long ballId = cursor.getLong(0);
         cursor.close();
         
         cursor = db.query(Player.TABLE_NAME, new String[] {Player._ID},
-        		null, null, null, null, null);
+                null, null, null, null, null);
         cursor.moveToFirst();
         long playerId = cursor.getLong(0);
         cursor.close();
         
         cursor = db.query(Course.TABLE_NAME, new String[] {Course._ID},
-        		null, null, null, null, null);
+                null, null, null, null, null);
         cursor.moveToFirst();
         long courseId = cursor.getLong(0);
         cursor.close();
         
         cursor = db.query(Club.TABLE_NAME, new String[] {Club._ID},
-        		null, null, null, null, null);
+                null, null, null, null, null);
         List<Long> clubIds = new ArrayList<Long>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -106,7 +106,7 @@ public final class DbHelperTest extends AndroidTestCase {
         cursor.close();
         
         cursor = db.query(Hole.TABLE_NAME, new String[] {Hole._ID},
-        		null, null, null, null, null);
+                null, null, null, null, null);
         List<Long> holeIds = new ArrayList<Long>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -128,16 +128,16 @@ public final class DbHelperTest extends AndroidTestCase {
                 values.put(Shot.DISTANCE, rand.nextDouble() * 400);
                 values.put(Shot.BALL, ballId);
                 values.put(Shot.CLUB,
-                		clubIds.get(rand.nextInt(clubIds.size())));
+                        clubIds.get(rand.nextInt(clubIds.size())));
                 values.put(Shot.END_LATITUDE, (rand.nextDouble() - 0.5) * 180);
                 values.put(Shot.END_LONGITUDE, rand.nextDouble() * 360);
                 values.put(Shot.HOLE,
-                		holeIds.get(rand.nextInt(holeIds.size())));
+                        holeIds.get(rand.nextInt(holeIds.size())));
                 values.put(Shot.LATERAL, (rand.nextDouble() - 0.5) * 100);
                 values.put(Shot.NUMBER, (i % 7) + 1);
                 values.put(Shot.ROUND, roundId);
                 values.put(Shot.START_LATITUDE,
-                		(rand.nextDouble() - 0.5) * 180);
+                        (rand.nextDouble() - 0.5) * 180);
                 values.put(Shot.START_LONGITUDE, rand.nextDouble() * 360);
                 values.put(Shot.WIND_DIR, rand.nextDouble() * 360);
                 values.put(Shot.WIND_SPEED, rand.nextDouble() * 50);
@@ -155,8 +155,8 @@ public final class DbHelperTest extends AndroidTestCase {
 
         db = helper.getWritableDatabase();
         cursor = db.rawQuery(
-        		"SELECT description, count(" + Shot.DISTANCE + "), "
-        		+ "sum(" + Shot.DISTANCE + ") FROM "
+                "SELECT description, count(" + Shot.DISTANCE + "), "
+                + "sum(" + Shot.DISTANCE + ") FROM "
                 + Shot.TABLE_NAME + " s LEFT JOIN " + Club.TABLE_NAME + " c "
                 + "ON s." + Shot.CLUB + " = c." + Club._ID
                 + " GROUP BY c." + Club._ID, null);
@@ -165,8 +165,8 @@ public final class DbHelperTest extends AndroidTestCase {
         while (!cursor.isAfterLast()) {
             clubIds.add(cursor.getLong(0));
             Log.d(TAG, "Club: " + cursor.getString(0)
-            		+ "  Shots: " + cursor.getLong(1)
-            		+ "  Avg Distance: " + cursor.getDouble(2));
+                    + "  Shots: " + cursor.getLong(1)
+                    + "  Avg Distance: " + cursor.getDouble(2));
             cursor.moveToNext();
         }
         Log.d(TAG, "Calculating took: " + (System.nanoTime() - startTime));

@@ -23,7 +23,7 @@ import android.util.Log;
  */
 public class DbHelper extends SQLiteOpenHelper {
     
-	/** Logging tag. */
+    /** Logging tag. */
     private static final String TAG = "DbHelper";
     /** The name of the database file. */
     public static final String DATABASE_FILENAME = "WhichClub.db";
@@ -45,8 +45,8 @@ public class DbHelper extends SQLiteOpenHelper {
      * @return whether the database was deleted
      */
     public static final boolean deleteDatabase(final Context context) {
-    	Log.w(TAG, "Deleting the database: " + getDatabaseFile(context));
-    	return context.deleteDatabase(DATABASE_FILENAME);
+        Log.w(TAG, "Deleting the database: " + getDatabaseFile(context));
+        return context.deleteDatabase(DATABASE_FILENAME);
     }
 
     /**
@@ -221,7 +221,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public final void onUpgrade(final SQLiteDatabase db,
-    		final int oldVersion, final int newVersion) {
+            final int oldVersion, final int newVersion) {
         Log.w(TAG, "Upgrading from " + oldVersion + " to " + newVersion);
         db.execSQL("DROP TABLE IF EXISTS " + Shot.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + Round.TABLE_NAME);

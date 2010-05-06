@@ -28,7 +28,7 @@ import android.widget.TextView;
  */
 public class Main extends Activity {
 
-	/** The listener for clicks on the NewRound button. */
+    /** The listener for clicks on the NewRound button. */
     private OnClickListener mNewRoundListener = new OnClickListener() {
         @Override
         public void onClick(final View v) {
@@ -36,7 +36,7 @@ public class Main extends Activity {
         }
     };
     
-	/** The listener for clicks on the FindCourse button. */
+    /** The listener for clicks on the FindCourse button. */
     private OnClickListener mFindCourseListener = new OnClickListener() {
         @Override
         public void onClick(final View v) {
@@ -53,9 +53,9 @@ public class Main extends Activity {
 
         // Hook up button presses to the appropriate event handler.
         ((Button) findViewById(R.id.NewRound))
-        		.setOnClickListener(mNewRoundListener);
+                .setOnClickListener(mNewRoundListener);
         ((Button) findViewById(R.id.FindCourse))
-        		.setOnClickListener(mFindCourseListener);
+                .setOnClickListener(mFindCourseListener);
         
         StringBuilder stats = new StringBuilder();
         DbHelper helper = new DbHelper(getApplicationContext());
@@ -84,7 +84,7 @@ public class Main extends Activity {
     private String countRecords(final SQLiteDatabase db, final String table) {
         String stats = table + "s: ";
         Cursor cursor = db.query(table, new String[] {"count(_id)"},
-        		null, null, null, null, null);
+                null, null, null, null, null);
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
             stats += cursor.getLong(0) + "\n";

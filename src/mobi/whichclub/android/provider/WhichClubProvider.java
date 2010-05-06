@@ -24,7 +24,7 @@ import mobi.whichclub.android.data.Round;
  */
 public class WhichClubProvider extends ContentProvider {
 
-	/** Logging tag. */
+    /** Logging tag. */
     private static final String TAG = "WhichClubProvider";
     /** The authority for the provider's URIs. */
     public static final String AUTHORITY = "mobi.whichclub.android.data";
@@ -76,7 +76,7 @@ public class WhichClubProvider extends ContentProvider {
     
     @Override
     public final Cursor query(final Uri uri, final String[] projection,
-    		final String selection, final String[] selectionArgs,
+            final String selection, final String[] selectionArgs,
             final String sortOrder) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         String orderBy;
@@ -142,7 +142,7 @@ public class WhichClubProvider extends ContentProvider {
         // Get the database and run the query
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         Cursor c = qb.query(db, projection, selection, selectionArgs,
-        		null, null, orderBy);
+                null, null, orderBy);
 
         // Tell the cursor what URI to watch for source data changes
         c.setNotificationUri(getContext().getContentResolver(), uri);
@@ -179,10 +179,10 @@ public class WhichClubProvider extends ContentProvider {
 
     @Override
     public final Uri insert(final Uri uri, final ContentValues initialValues) {
-    	Log.d(TAG, "Inserting " + uri + ": " + initialValues.toString());
-    	
-    	String table;
-    	String nullColumnHack;
+        Log.d(TAG, "Inserting " + uri + ": " + initialValues.toString());
+        
+        String table;
+        String nullColumnHack;
         ContentValues values;
         if (initialValues != null) {
             values = new ContentValues(initialValues);
@@ -193,20 +193,20 @@ public class WhichClubProvider extends ContentProvider {
         // Validate the requested uri
         switch (URI_MATCHER.match(uri)) {
         case COURSES:
-        	table = Course.TABLE_NAME;
-        	nullColumnHack = Course.NAME;
+            table = Course.TABLE_NAME;
+            nullColumnHack = Course.NAME;
             break;
 
         case PLAYERS:
-        	table = Player.TABLE_NAME;
-        	nullColumnHack = Player.NAME;
+            table = Player.TABLE_NAME;
+            nullColumnHack = Player.NAME;
             break;
 
         case ROUNDS:
-        	table = Round.TABLE_NAME;
-        	nullColumnHack = Round.SCORE;
+            table = Round.TABLE_NAME;
+            nullColumnHack = Round.SCORE;
             if (!values.containsKey(Round.DATE)) {
-            	values.put(Round.DATE, System.currentTimeMillis());
+                values.put(Round.DATE, System.currentTimeMillis());
             }
             break;
 
@@ -218,7 +218,7 @@ public class WhichClubProvider extends ContentProvider {
         long rowId = db.insert(table, nullColumnHack, values);
         if (rowId >= 0) {
             Uri courseUri =
-            	ContentUris.withAppendedId(uri, rowId);
+                ContentUris.withAppendedId(uri, rowId);
             getContext().getContentResolver().notifyChange(courseUri, null);
             return courseUri;
         }
@@ -233,44 +233,44 @@ public class WhichClubProvider extends ContentProvider {
      * @return the new where clause, including the record ID
      */
     private String whereWithId(final String id, final String where) {
-    	if (id == null) {
-    		return where;
-    	}
+        if (id == null) {
+            return where;
+        }
 
-    	// All _ID's come from BaseColumns, so use Course for any table
+        // All _ID's come from BaseColumns, so use Course for any table
         String whereWithId = Course._ID + "=" + id;
         if (!TextUtils.isEmpty(where)) {
-        	whereWithId += " AND (" + where + ')';
+            whereWithId += " AND (" + where + ')';
         }
         return whereWithId;
     }
     
     @Override
     public final int delete(final Uri uri,
-    		final String where, final String[] whereArgs) {
-    	Log.d(TAG, "Deleting " + uri + " where "
-    			+ where + "[" + whereArgs + "]");
-    	
-    	String table;
-    	String recordId = null;
-    	
+            final String where, final String[] whereArgs) {
+        Log.d(TAG, "Deleting " + uri + " where "
+                + where + "[" + whereArgs + "]");
+        
+        String table;
+        String recordId = null;
+        
         switch (URI_MATCHER.match(uri)) {
         case COURSE_ID:
-        	recordId = uri.getPathSegments().get(1);
+            recordId = uri.getPathSegments().get(1);
         case COURSES:
-        	table = Course.TABLE_NAME;
+            table = Course.TABLE_NAME;
             break;
 
         case PLAYER_ID:
-        	recordId = uri.getPathSegments().get(1);
+            recordId = uri.getPathSegments().get(1);
         case PLAYERS:
-        	table = Player.TABLE_NAME;
+            table = Player.TABLE_NAME;
             break;
 
         case ROUND_ID:
-        	recordId = uri.getPathSegments().get(1);
+            recordId = uri.getPathSegments().get(1);
         case ROUNDS:
-        	table = Round.TABLE_NAME;
+            table = Round.TABLE_NAME;
             break;
 
         default:
@@ -279,12 +279,12 @@ public class WhichClubProvider extends ContentProvider {
 
         // Make sure the WHERE clause is non-empty, or the record count won't work
         String nonEmptyWhere = where;
-    	if (TextUtils.isEmpty(nonEmptyWhere)) {
-    		nonEmptyWhere = "1";
-    	}
+        if (TextUtils.isEmpty(nonEmptyWhere)) {
+            nonEmptyWhere = "1";
+        }
 
-    	SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-    	int count = db.delete(table, whereWithId(recordId, nonEmptyWhere), whereArgs);
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        int count = db.delete(table, whereWithId(recordId, nonEmptyWhere), whereArgs);
         
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
@@ -292,39 +292,39 @@ public class WhichClubProvider extends ContentProvider {
 
     @Override
     public final int update(final Uri uri, final ContentValues values,
-    		final String where, final String[] whereArgs) {
-    	Log.d(TAG, "Updating " + uri + " where "
-    			+ where + "[" + whereArgs + "]");
+            final String where, final String[] whereArgs) {
+        Log.d(TAG, "Updating " + uri + " where "
+                + where + "[" + whereArgs + "]");
 
-    	String table;
-    	String recordId = null;
-    	
+        String table;
+        String recordId = null;
+        
         switch (URI_MATCHER.match(uri)) {
         case COURSE_ID:
             recordId = uri.getPathSegments().get(1);
         case COURSES:
-        	table = Course.TABLE_NAME;
+            table = Course.TABLE_NAME;
             break;
 
         case PLAYER_ID:
             recordId = uri.getPathSegments().get(1);
         case PLAYERS:
-        	table = Player.TABLE_NAME;
+            table = Player.TABLE_NAME;
             break;
 
         case ROUND_ID:
             recordId = uri.getPathSegments().get(1);
         case ROUNDS:
-        	table = Round.TABLE_NAME;
+            table = Round.TABLE_NAME;
             break;
 
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
 
-    	SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int count = db.update(table, values,
-        		whereWithId(recordId, where), whereArgs);
+                whereWithId(recordId, where), whereArgs);
         
         getContext().getContentResolver().notifyChange(uri, null);
         return count;

@@ -34,7 +34,7 @@ public class StartRound extends Activity {
     /** The selected player record's ID. */
     private Long playerId = null;
 
-	/** The listener for clicks on the StartRound button. */
+    /** The listener for clicks on the StartRound button. */
     private OnClickListener mNewStartListener = new OnClickListener() {
         @Override
         public void onClick(final View v) {
@@ -75,7 +75,7 @@ public class StartRound extends Activity {
 
         // Hook up button presses to the appropriate event handler.
         ((Button) findViewById(R.id.StartRound))
-        		.setOnClickListener(mNewStartListener);
+                .setOnClickListener(mNewStartListener);
         
         // Load the Courses spinner
         Spinner courseSpinner = (Spinner) findViewById(R.id.CourseName);

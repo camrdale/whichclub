@@ -17,7 +17,7 @@ public class Club implements BaseColumns {
      * The type of the club.
      */
     public static enum ClubType {
-    	/** Club type. */
+        /** Club type. */
         Driver, Wood, Iron, Wedge, Putter;
     }
 
@@ -37,19 +37,19 @@ public class Club implements BaseColumns {
     
     /** The content:// style URL for this table. */
     public static final Uri CONTENT_URI = Uri.parse(
-    		"content://" + WhichClubProvider.AUTHORITY + "/" + TABLE_NAME);
+            "content://" + WhichClubProvider.AUTHORITY + "/" + TABLE_NAME);
 
     /** The content type for multiple records from this table. */
     public static final String CONTENT_MULTI_TYPE =
-    	"vnd.android.cursor.dir/vnd.which" + TABLE_NAME;
+        "vnd.android.cursor.dir/vnd.which" + TABLE_NAME;
 
     /** The content type for a single record from this table. */
     public static final String CONTENT_ITEM_TYPE =
-    	"vnd.android.cursor.item/vnd.which" + TABLE_NAME;
+        "vnd.android.cursor.item/vnd.which" + TABLE_NAME;
 
     /** The default sort order for records returned from this table. */
     public static final String DEFAULT_SORT_ORDER =
-    	TYPE + " ASC" + ", " + NUMBER + " ASC";
+        TYPE + " ASC" + ", " + NUMBER + " ASC";
 
     /** A default column projection to get all the columns. */
     public static final String[] PROJECTION = new String[] {
@@ -62,8 +62,8 @@ public class Club implements BaseColumns {
     };
     
     /** A default column projection map to get all the columns. */
-	public static final Map<String, String> PROJECTION_MAP =
-		new HashMap<String, String>();
+    public static final Map<String, String> PROJECTION_MAP =
+        new HashMap<String, String>();
     
     static {
         PROJECTION_MAP.put(_ID, _ID);
