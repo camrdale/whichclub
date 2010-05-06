@@ -29,6 +29,28 @@ public class StartRound extends Activity {
     /** Logging tag. */
     private static final String TAG = "StartRound";
 
+    /** The position of the course's id in the cursor. */
+    private static final int COURSE_ID = 0;
+    /** The position of the course's name in the cursor. */
+    private static final int COURSE_NAME = 1;
+    /** The columns to get when querying for courses. */
+    public static final String[] COURSE_PROJECTION = new String[2];
+    static {
+        COURSE_PROJECTION[COURSE_ID] = Course._ID;
+        COURSE_PROJECTION[COURSE_NAME] = Course.NAME;
+    }
+    
+    /** The position of the player's id in the cursor. */
+    private static final int PLAYER_ID = 0;
+    /** The position of the player's name in the cursor. */
+    private static final int PLAYER_NAME = 1;
+    /** The columns to get when querying for players. */
+    public static final String[] PLAYER_PROJECTION = new String[2];
+    static {
+        PLAYER_PROJECTION[PLAYER_ID] = Player._ID;
+        PLAYER_PROJECTION[PLAYER_NAME] = Player.NAME;
+    }
+    
     /** The selected course record's ID. */
     private Long courseId = null;
     /** The selected player record's ID. */
@@ -80,7 +102,7 @@ public class StartRound extends Activity {
         // Load the Courses spinner
         Spinner courseSpinner = (Spinner) findViewById(R.id.CourseName);
         Cursor cursor = managedQuery(Course.CONTENT_URI,
-                Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+                COURSE_PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(getApplicationContext(),
                 android.R.layout.simple_spinner_item, cursor,
                 new String[] {Course.NAME}, new int[] {android.R.id.text1});
@@ -91,7 +113,7 @@ public class StartRound extends Activity {
         // Load the Players spinner
         Spinner playerSpinner = (Spinner) findViewById(R.id.PersonChooser);
         cursor = managedQuery(Player.CONTENT_URI,
-                Player.PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
+                PLAYER_PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
         adapter = new SimpleCursorAdapter(getApplicationContext(),
                 android.R.layout.simple_spinner_item, cursor,
                 new String[] {Player.NAME}, new int[] {android.R.id.text1});

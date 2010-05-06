@@ -59,24 +59,6 @@ public class Shot implements BaseColumns {
     /** The default sort order for records returned from this table. */
     public static final String DEFAULT_SORT_ORDER = NUMBER + " ASC";
 
-    /** A default column projection to get all the columns. */
-    public static final String[] PROJECTION = new String[] {
-        _ID, // 0
-        ROUND, // 1
-        HOLE, // 2
-        CLUB, // 3
-        BALL, // 4
-        NUMBER, // 5
-        DISTANCE, // 6
-        LATERAL, // 7
-        START_LATITUDE, // 8
-        START_LONGITUDE, // 9
-        END_LATITUDE, // 10
-        END_LONGITUDE, // 11
-        WIND_DIR, // 12
-        WIND_SPEED // 13
-    };
-    
     /** A default column projection map to get all the columns. */
     public static final Map<String, String> PROJECTION_MAP =
         new HashMap<String, String>();

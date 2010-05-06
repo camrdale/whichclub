@@ -51,16 +51,6 @@ public class Club implements BaseColumns {
     public static final String DEFAULT_SORT_ORDER =
         TYPE + " ASC" + ", " + NUMBER + " ASC";
 
-    /** A default column projection to get all the columns. */
-    public static final String[] PROJECTION = new String[] {
-        _ID, // 0
-        TYPE, // 1
-        NUMBER, // 2
-        MANUFACTURER, // 3
-        MODEL, // 4
-        DESCRIPTION // 5
-    };
-    
     /** A default column projection map to get all the columns. */
     public static final Map<String, String> PROJECTION_MAP =
         new HashMap<String, String>();

@@ -42,16 +42,6 @@ public class Round implements BaseColumns {
     /** The default sort order for records returned from this table. */
     public static final String DEFAULT_SORT_ORDER = DATE + " ASC";
 
-    /** A default column projection to get all the columns. */
-    public static final String[] PROJECTION = new String[] {
-        _ID, // 0
-        COURSE, // 1
-        PLAYER, // 2
-        SCORE, // 3
-        GIR, // 4
-        DATE // 5
-    };
-    
     /** A default column projection map to get all the columns. */
     public static final Map<String, String> PROJECTION_MAP =
         new HashMap<String, String>();

@@ -28,6 +28,23 @@ public class SelectHole extends Activity {
     /** The key to use to store the saved position of the cursor. */
     private static final String SAVED_POSITION = "saved_position";
     
+    /** The position of the hole's id in the cursor. */
+    private static final int HOLE_ID = 0;
+    /** The position of the hole's number in the cursor. */
+    private static final int HOLE_NUMBER = 1;
+    /** The position of the hole's par in the cursor. */
+    private static final int HOLE_PAR = 2;
+    /** The position of the hole's handicap in the cursor. */
+    private static final int HOLE_HANDICAP = 3;
+    /** The columns to get when querying for holes. */
+    private static final String[] HOLE_PROJECTION = new String[4];
+    static {
+        HOLE_PROJECTION[HOLE_ID] = Hole._ID;
+        HOLE_PROJECTION[HOLE_NUMBER] = Hole.NUMBER;
+        HOLE_PROJECTION[HOLE_PAR] = Hole.PAR;
+        HOLE_PROJECTION[HOLE_HANDICAP] = Hole.HANDICAP;
+    }
+    
     /** The cursor containing the queried data. */
     private Cursor cursor;
     /** The text containing the number of the hole. */
@@ -102,7 +119,7 @@ public class SelectHole extends Activity {
         parText = (TextView) findViewById(R.id.Par);
 
         // Get the note!
-        cursor = managedQuery(mUri, Hole.PROJECTION, null, null, Hole.NUMBER + " ASC");
+        cursor = managedQuery(mUri, HOLE_PROJECTION, null, null, Hole.NUMBER + " ASC");
 
         // If an instance of this activity had previously stopped, we can
         // get the original text it started with.
@@ -148,19 +165,8 @@ public class SelectHole extends Activity {
      */
     private void updateState() {
         cursor.moveToPosition(currentPosition);
-        holeText.setText(Integer.toString(cursor.getInt(2)));
-        parText.setText(Integer.toString(cursor.getInt(3)));
+        holeText.setText(Integer.toString(cursor.getInt(HOLE_NUMBER)));
+        parText.setText(Integer.toString(cursor.getInt(HOLE_PAR)));
     }
 
-//    /**
-//     * 
-//     */
-//    protected void startRound() {
-//        Intent i = new Intent(this, SelectHole.class);
-//        
-//        ((Spinner) findViewById(R.id.CourseName)).getSelectedItem();
-//        ((Spinner) findViewById(R.id.PersonChooser)).getSelectedItem();
-//        Round round = new Round(course, player, new Date());
-//        startActivity(i);
-//    }
 }

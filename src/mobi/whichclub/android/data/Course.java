@@ -47,18 +47,6 @@ public class Course implements BaseColumns {
     /** The default sort order for records returned from this table. */
     public static final String DEFAULT_SORT_ORDER = NAME + " ASC";
 
-    /** A default column projection to get all the columns. */
-    public static final String[] PROJECTION = new String[] {
-        _ID, // 0
-        NAME, // 1
-        PAR, // 2
-        CITY, // 3
-        STATE_PROV, // 4
-        COUNTRY, // 5
-        LATITUDE, // 6
-        LONGITUDE // 7
-    };
-    
     /** A default column projection map to get all the columns. */
     public static final Map<String, String> PROJECTION_MAP =
         new HashMap<String, String>();

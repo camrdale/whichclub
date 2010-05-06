@@ -17,11 +17,63 @@ import android.util.Log;
  * @author camrdale
  *
  */
-public final class WhichClubProviderTest
-            extends ProviderTestCase2<WhichClubProvider> {
+public final class WhichClubProviderTest extends ProviderTestCase2<WhichClubProvider> {
     
     /** Logging tag. */
     private static final String TAG = "WhichClubProviderTest";
+    
+    /** The position of the course's id in the cursor. */
+    private static final int COURSE_ID = 0;
+    /** The position of the course's name in the cursor. */
+    private static final int COURSE_NAME = 1;
+    /** The position of the course's par in the cursor. */
+    private static final int COURSE_PAR = 2;
+    /** The columns to get when querying for courses. */
+    public static final String[] COURSE_PROJECTION = new String[3];
+    static {
+        COURSE_PROJECTION[COURSE_ID] = Course._ID;
+        COURSE_PROJECTION[COURSE_NAME] = Course.NAME;
+        COURSE_PROJECTION[COURSE_PAR] = Course.PAR;
+    }
+    
+    /** The position of the player's id in the cursor. */
+    private static final int PLAYER_ID = 0;
+    /** The position of the player's name in the cursor. */
+    private static final int PLAYER_NAME = 1;
+    /** The columns to get when querying for players. */
+    public static final String[] PLAYER_PROJECTION = new String[2];
+    static {
+        PLAYER_PROJECTION[PLAYER_ID] = Player._ID;
+        PLAYER_PROJECTION[PLAYER_NAME] = Player.NAME;
+    }
+    
+    /** The position of the round's id in the cursor. */
+    private static final int ROUND_ID = 0;
+    /** The position of the round's score in the cursor. */
+    private static final int ROUND_SCORE = 1;
+    /** The position of the round's GIR in the cursor. */
+    private static final int ROUND_GIR = 2;
+    /** The columns to get when querying for rounds. */
+    public static final String[] ROUND_PROJECTION = new String[3];
+    static {
+        ROUND_PROJECTION[ROUND_ID] = Round._ID;
+        ROUND_PROJECTION[ROUND_SCORE] = Round.SCORE;
+        ROUND_PROJECTION[ROUND_GIR] = Round.GIR;
+    }
+    
+    /** The position of the hole's id in the cursor. */
+    private static final int HOLE_ID = 0;
+    /** The position of the hole's course in the cursor. */
+    private static final int HOLE_COURSE = 1;
+    /** The position of the hole's number in the cursor. */
+    private static final int HOLE_NUMBER = 2;
+    /** The columns to get when querying for holes. */
+    private static final String[] HOLE_PROJECTION = new String[3];
+    static {
+        HOLE_PROJECTION[HOLE_ID] = Hole._ID;
+        HOLE_PROJECTION[HOLE_COURSE] = Hole.COURSE;
+        HOLE_PROJECTION[HOLE_NUMBER] = Hole.NUMBER;
+    }
     
     /**
      * Initialize the ProviderTestCase for the WhichClubProvider.
@@ -46,15 +98,15 @@ public final class WhichClubProviderTest
      */
     private long getDefaultCourseId() {
         Cursor cursor = getMockContentResolver().query(
-                Course.CONTENT_URI, Course.PROJECTION,
+                Course.CONTENT_URI, COURSE_PROJECTION,
                 Course.NAME + "=?", new String[] {"Default"},
                 Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         long courseId = -1;
         while (!cursor.isAfterLast()) {
-            assertEquals("Default", cursor.getString(1));
-            courseId = cursor.getLong(0);
+            assertEquals("Default", cursor.getString(COURSE_NAME));
+            courseId = cursor.getLong(COURSE_ID);
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " courses");
@@ -70,15 +122,15 @@ public final class WhichClubProviderTest
      */
     private long getDefaultPlayerId() {
         Cursor cursor = getMockContentResolver().query(
-                Player.CONTENT_URI, Player.PROJECTION,
+                Player.CONTENT_URI, PLAYER_PROJECTION,
                 Player.NAME + "=?", new String[] {"Default"},
                 Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         long playerId = -1;
         while (!cursor.isAfterLast()) {
-            assertEquals("Default", cursor.getString(1));
-            playerId = cursor.getLong(0);
+            assertEquals("Default", cursor.getString(PLAYER_NAME));
+            playerId = cursor.getLong(PLAYER_ID);
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " players");
@@ -94,12 +146,12 @@ public final class WhichClubProviderTest
     @SmallTest
     public void testQuerySingleCourse() {
         Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
-                Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+                COURSE_PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found course: " + cursor.getString(1));
-            assertEquals("Default", cursor.getString(1));
+            Log.d(TAG, "Found course: " + cursor.getString(COURSE_NAME));
+            assertEquals("Default", cursor.getString(COURSE_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " courses");
@@ -119,11 +171,11 @@ public final class WhichClubProviderTest
         getMockContentResolver().insert(Course.CONTENT_URI, values);
 
         Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
-                Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+                COURSE_PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found course: " + cursor.getString(1));
+            Log.d(TAG, "Found course: " + cursor.getString(COURSE_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " courses");
@@ -146,12 +198,12 @@ public final class WhichClubProviderTest
 
         Uri result = ContentUris.withAppendedId(Course.CONTENT_URI, courseId);
         Cursor cursor = getMockContentResolver().query(result,
-                Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+                COURSE_PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found course: " + cursor.getString(1));
-            assertEquals("Default", cursor.getString(1));
+            Log.d(TAG, "Found course: " + cursor.getString(COURSE_NAME));
+            assertEquals("Default", cursor.getString(COURSE_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " courses");
@@ -173,14 +225,14 @@ public final class WhichClubProviderTest
         long courseId = getDefaultCourseId();
 
         Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
-                Course.PROJECTION, Course.NAME + "=?", new String[] {"Default"},
+                COURSE_PROJECTION, Course.NAME + "=?", new String[] {"Default"},
                 Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found course: " + cursor.getString(1));
-            assertEquals(courseId, cursor.getInt(0));
-            assertEquals("Default", cursor.getString(1));
+            Log.d(TAG, "Found course: " + cursor.getString(COURSE_NAME));
+            assertEquals(courseId, cursor.getInt(COURSE_ID));
+            assertEquals("Default", cursor.getString(COURSE_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " courses");
@@ -199,12 +251,12 @@ public final class WhichClubProviderTest
             getMockContentResolver().insert(Course.CONTENT_URI, values);
         
         Cursor cursor = getMockContentResolver().query(result,
-                Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+                COURSE_PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found course: " + cursor.getString(1));
-            assertEquals("NewCourse", cursor.getString(1));
+            Log.d(TAG, "Found course: " + cursor.getString(COURSE_NAME));
+            assertEquals("NewCourse", cursor.getString(COURSE_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " courses");
@@ -227,13 +279,13 @@ public final class WhichClubProviderTest
         assertEquals(1, updated);
 
         Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
-                Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+                COURSE_PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found course: " + cursor.getString(1));
-            assertEquals("Default", cursor.getString(1));
-            assertEquals(32, cursor.getInt(2));
+            Log.d(TAG, "Found course: " + cursor.getString(COURSE_NAME));
+            assertEquals("Default", cursor.getString(COURSE_NAME));
+            assertEquals(32, cursor.getInt(COURSE_PAR));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " courses");
@@ -259,12 +311,12 @@ public final class WhichClubProviderTest
         assertEquals(3, updated);
 
         Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
-                Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+                COURSE_PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found course: " + cursor.getString(1));
-            assertEquals(32, cursor.getInt(2));
+            Log.d(TAG, "Found course: " + cursor.getString(COURSE_NAME));
+            assertEquals(32, cursor.getInt(COURSE_PAR));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " courses");
@@ -293,13 +345,13 @@ public final class WhichClubProviderTest
         assertEquals(1, updated);
 
         Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
-                Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+                COURSE_PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found course: " + cursor.getString(1));
-            if ("Default".equals(cursor.getString(1))) {
-                assertEquals(32, cursor.getInt(2));
+            Log.d(TAG, "Found course: " + cursor.getString(COURSE_NAME));
+            if ("Default".equals(cursor.getString(COURSE_NAME))) {
+                assertEquals(32, cursor.getInt(COURSE_PAR));
             } else {
                 assertTrue(cursor.isNull(2));
             }
@@ -322,7 +374,7 @@ public final class WhichClubProviderTest
         assertEquals(1, deleted);
 
         Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
-                Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+                COURSE_PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -351,7 +403,7 @@ public final class WhichClubProviderTest
         assertEquals(3, deleted);
 
         Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
-                Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+                COURSE_PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -381,12 +433,12 @@ public final class WhichClubProviderTest
         assertEquals(1, deleted);
 
         Cursor cursor = getMockContentResolver().query(Course.CONTENT_URI,
-                Course.PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
+                COURSE_PROJECTION, null, null, Course.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found course: " + cursor.getString(1));
-            assertFalse("Default".equals(cursor.getString(1)));
+            Log.d(TAG, "Found course: " + cursor.getString(COURSE_NAME));
+            assertFalse("Default".equals(cursor.getString(COURSE_NAME)));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " courses");
@@ -400,12 +452,12 @@ public final class WhichClubProviderTest
     @SmallTest
     public void testQuerySinglePlayer() {
         Cursor cursor = getMockContentResolver().query(Player.CONTENT_URI,
-                Player.PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
+                PLAYER_PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found player: " + cursor.getString(1));
-            assertEquals("Default", cursor.getString(1));
+            Log.d(TAG, "Found player: " + cursor.getString(PLAYER_NAME));
+            assertEquals("Default", cursor.getString(PLAYER_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " players");
@@ -425,11 +477,11 @@ public final class WhichClubProviderTest
         getMockContentResolver().insert(Player.CONTENT_URI, values);
 
         Cursor cursor = getMockContentResolver().query(Player.CONTENT_URI,
-                Player.PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
+                PLAYER_PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found player: " + cursor.getString(1));
+            Log.d(TAG, "Found player: " + cursor.getString(PLAYER_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " players");
@@ -452,12 +504,12 @@ public final class WhichClubProviderTest
 
         Uri result = ContentUris.withAppendedId(Player.CONTENT_URI, playerId);
         Cursor cursor = getMockContentResolver().query(result,
-                Player.PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
+                PLAYER_PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found player: " + cursor.getString(1));
-            assertEquals("Default", cursor.getString(1));
+            Log.d(TAG, "Found player: " + cursor.getString(PLAYER_NAME));
+            assertEquals("Default", cursor.getString(PLAYER_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " players");
@@ -479,14 +531,14 @@ public final class WhichClubProviderTest
         long playerId = getDefaultPlayerId();
 
         Cursor cursor = getMockContentResolver().query(Player.CONTENT_URI,
-                Player.PROJECTION, Player.NAME + "=?", new String[] {"Default"},
+                PLAYER_PROJECTION, Player.NAME + "=?", new String[] {"Default"},
                 Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found player: " + cursor.getString(1));
-            assertEquals(playerId, cursor.getInt(0));
-            assertEquals("Default", cursor.getString(1));
+            Log.d(TAG, "Found player: " + cursor.getString(PLAYER_NAME));
+            assertEquals(playerId, cursor.getInt(PLAYER_ID));
+            assertEquals("Default", cursor.getString(PLAYER_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " players");
@@ -505,12 +557,12 @@ public final class WhichClubProviderTest
             getMockContentResolver().insert(Player.CONTENT_URI, values);
         
         Cursor cursor = getMockContentResolver().query(result,
-                Player.PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
+                PLAYER_PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found player: " + cursor.getString(1));
-            assertEquals("NewPlayer", cursor.getString(1));
+            Log.d(TAG, "Found player: " + cursor.getString(PLAYER_NAME));
+            assertEquals("NewPlayer", cursor.getString(PLAYER_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " players");
@@ -533,12 +585,12 @@ public final class WhichClubProviderTest
         assertEquals(1, updated);
 
         Cursor cursor = getMockContentResolver().query(Player.CONTENT_URI,
-                Player.PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
+                PLAYER_PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found player: " + cursor.getString(1));
-            assertEquals("UpdatedName", cursor.getString(1));
+            Log.d(TAG, "Found player: " + cursor.getString(PLAYER_NAME));
+            assertEquals("UpdatedName", cursor.getString(PLAYER_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " players");
@@ -564,12 +616,12 @@ public final class WhichClubProviderTest
         assertEquals(3, updated);
 
         Cursor cursor = getMockContentResolver().query(Player.CONTENT_URI,
-                Player.PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
+                PLAYER_PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found player: " + cursor.getString(1));
-            assertEquals("UpdatedName", cursor.getString(1));
+            Log.d(TAG, "Found player: " + cursor.getString(PLAYER_NAME));
+            assertEquals("UpdatedName", cursor.getString(PLAYER_NAME));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " players");
@@ -598,15 +650,15 @@ public final class WhichClubProviderTest
         assertEquals(1, updated);
 
         Cursor cursor = getMockContentResolver().query(Player.CONTENT_URI,
-                Player.PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
+                PLAYER_PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found player: " + cursor.getString(1));
-            if (playerId == cursor.getLong(0)) {
-                assertEquals("UpdatedName", cursor.getString(1));
+            Log.d(TAG, "Found player: " + cursor.getString(PLAYER_NAME));
+            if (playerId == cursor.getLong(PLAYER_ID)) {
+                assertEquals("UpdatedName", cursor.getString(PLAYER_NAME));
             } else {
-                assertFalse("Default".equals(cursor.getString(1)));
+                assertFalse("Default".equals(cursor.getString(PLAYER_NAME)));
             }
             cursor.moveToNext();
         }
@@ -627,7 +679,7 @@ public final class WhichClubProviderTest
         assertEquals(1, deleted);
 
         Cursor cursor = getMockContentResolver().query(Player.CONTENT_URI,
-                Player.PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
+                PLAYER_PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -656,7 +708,7 @@ public final class WhichClubProviderTest
         assertEquals(3, deleted);
 
         Cursor cursor = getMockContentResolver().query(Player.CONTENT_URI,
-                Player.PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
+                PLAYER_PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -686,12 +738,12 @@ public final class WhichClubProviderTest
         assertEquals(1, deleted);
 
         Cursor cursor = getMockContentResolver().query(Player.CONTENT_URI,
-                Player.PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
+                PLAYER_PROJECTION, null, null, Player.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found player: " + cursor.getString(1));
-            assertFalse("Default".equals(cursor.getString(1)));
+            Log.d(TAG, "Found player: " + cursor.getString(PLAYER_NAME));
+            assertFalse("Default".equals(cursor.getString(PLAYER_NAME)));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " players");
@@ -709,12 +761,12 @@ public final class WhichClubProviderTest
         getMockContentResolver().insert(Round.CONTENT_URI, values);
         
         Cursor cursor = getMockContentResolver().query(Round.CONTENT_URI,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found round: " + cursor.getInt(3));
-            assertEquals(72, cursor.getInt(3));
+            Log.d(TAG, "Found round: " + cursor.getInt(ROUND_SCORE));
+            assertEquals(72, cursor.getInt(ROUND_SCORE));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " rounds");
@@ -736,11 +788,11 @@ public final class WhichClubProviderTest
         getMockContentResolver().insert(Round.CONTENT_URI, values);
 
         Cursor cursor = getMockContentResolver().query(Round.CONTENT_URI,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found round: " + cursor.getInt(3));
+            Log.d(TAG, "Found round: " + cursor.getInt(ROUND_SCORE));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " rounds");
@@ -764,12 +816,12 @@ public final class WhichClubProviderTest
 
         result = ContentUris.withAppendedId(Round.CONTENT_URI, roundId);
         Cursor cursor = getMockContentResolver().query(result,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found round: " + cursor.getInt(3));
-            assertEquals(73, cursor.getInt(3));
+            Log.d(TAG, "Found round: " + cursor.getInt(ROUND_SCORE));
+            assertEquals(73, cursor.getInt(ROUND_SCORE));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " rounds");
@@ -792,13 +844,13 @@ public final class WhichClubProviderTest
         getMockContentResolver().insert(Round.CONTENT_URI, values);
 
         Cursor cursor = getMockContentResolver().query(result,
-                Round.PROJECTION, Round.SCORE + "=73", null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, Round.SCORE + "=73", null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found round: " + cursor.getInt(3));
-            assertEquals(roundId, cursor.getLong(0));
-            assertEquals(73, cursor.getInt(3));
+            Log.d(TAG, "Found round: " + cursor.getInt(ROUND_SCORE));
+            assertEquals(roundId, cursor.getLong(ROUND_ID));
+            assertEquals(73, cursor.getInt(ROUND_SCORE));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " rounds");
@@ -816,12 +868,12 @@ public final class WhichClubProviderTest
         Uri result = getMockContentResolver().insert(Round.CONTENT_URI, values);
         
         Cursor cursor = getMockContentResolver().query(result,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found round: " + cursor.getInt(3));
-            assertEquals(72, cursor.getInt(3));
+            Log.d(TAG, "Found round: " + cursor.getInt(ROUND_SCORE));
+            assertEquals(72, cursor.getInt(ROUND_SCORE));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " rounds");
@@ -846,13 +898,13 @@ public final class WhichClubProviderTest
         assertEquals(1, updated);
 
         Cursor cursor = getMockContentResolver().query(Round.CONTENT_URI,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found round: " + cursor.getInt(3));
-            assertEquals(72, cursor.getInt(3));
-            assertEquals(12, cursor.getInt(4));
+            Log.d(TAG, "Found round: " + cursor.getInt(ROUND_SCORE));
+            assertEquals(72, cursor.getInt(ROUND_SCORE));
+            assertEquals(12, cursor.getInt(ROUND_GIR));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " rounds");
@@ -880,12 +932,12 @@ public final class WhichClubProviderTest
         assertEquals(3, updated);
 
         Cursor cursor = getMockContentResolver().query(Round.CONTENT_URI,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found round: " + cursor.getInt(3));
-            assertEquals(12, cursor.getInt(4));
+            Log.d(TAG, "Found round: " + cursor.getInt(ROUND_SCORE));
+            assertEquals(12, cursor.getInt(ROUND_GIR));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " rounds");
@@ -915,13 +967,13 @@ public final class WhichClubProviderTest
         assertEquals(1, updated);
 
         Cursor cursor = getMockContentResolver().query(Round.CONTENT_URI,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found round: " + cursor.getInt(3));
-            if (roundId == cursor.getLong(0)) {
-                assertEquals(12, cursor.getInt(4));
+            Log.d(TAG, "Found round: " + cursor.getInt(ROUND_SCORE));
+            if (roundId == cursor.getLong(ROUND_ID)) {
+                assertEquals(12, cursor.getInt(ROUND_GIR));
             } else {
                 assertTrue(cursor.isNull(4));
             }
@@ -947,7 +999,7 @@ public final class WhichClubProviderTest
         assertEquals(1, deleted);
 
         Cursor cursor = getMockContentResolver().query(Round.CONTENT_URI,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -978,7 +1030,7 @@ public final class WhichClubProviderTest
         assertEquals(3, deleted);
 
         Cursor cursor = getMockContentResolver().query(Round.CONTENT_URI,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -1009,12 +1061,12 @@ public final class WhichClubProviderTest
         assertEquals(1, deleted);
 
         Cursor cursor = getMockContentResolver().query(Round.CONTENT_URI,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found round: " + cursor.getInt(3));
-            assertFalse(73 == cursor.getInt(3));
+            Log.d(TAG, "Found round: " + cursor.getInt(ROUND_SCORE));
+            assertFalse(73 == cursor.getInt(ROUND_SCORE));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " rounds");
@@ -1047,12 +1099,12 @@ public final class WhichClubProviderTest
         result = ContentUris.withAppendedId(Course.CONTENT_URI, courseId);
         result = Uri.withAppendedPath(result, Round.TABLE_NAME);
         Cursor cursor = getMockContentResolver().query(result,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found round: " + cursor.getInt(3));
-            assertEquals(73, cursor.getInt(3));
+            Log.d(TAG, "Found round: " + cursor.getInt(ROUND_SCORE));
+            assertEquals(73, cursor.getInt(ROUND_SCORE));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " rounds");
@@ -1085,12 +1137,12 @@ public final class WhichClubProviderTest
         result = ContentUris.withAppendedId(Player.CONTENT_URI, playerId);
         result = Uri.withAppendedPath(result, Round.TABLE_NAME);
         Cursor cursor = getMockContentResolver().query(result,
-                Round.PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
+                ROUND_PROJECTION, null, null, Round.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found round: " + cursor.getInt(3));
-            assertEquals(73, cursor.getInt(3));
+            Log.d(TAG, "Found round: " + cursor.getInt(ROUND_SCORE));
+            assertEquals(73, cursor.getInt(ROUND_SCORE));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " rounds");
@@ -1124,12 +1176,12 @@ public final class WhichClubProviderTest
         result = ContentUris.withAppendedId(Round.CONTENT_URI, roundId);
         result = Uri.withAppendedPath(result, Hole.TABLE_NAME);
         Cursor cursor = getMockContentResolver().query(result,
-                Hole.PROJECTION, null, null, Hole.DEFAULT_SORT_ORDER);
+                HOLE_PROJECTION, null, null, Hole.DEFAULT_SORT_ORDER);
         assertNotNull(cursor);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Log.d(TAG, "Found hole: " + cursor.getInt(2));
-            assertEquals(courseId, cursor.getInt(1));
+            Log.d(TAG, "Found hole: " + cursor.getInt(HOLE_NUMBER));
+            assertEquals(courseId, cursor.getInt(HOLE_COURSE));
             cursor.moveToNext();
         }
         Log.d(TAG, "Found " + cursor.getCount() + " holes");

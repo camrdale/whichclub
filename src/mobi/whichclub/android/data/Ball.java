@@ -37,13 +37,6 @@ public class Ball implements BaseColumns {
     public static final String DEFAULT_SORT_ORDER =
         MANUFACTURER + " ASC, " + MODEL + " ASC";
 
-    /** A default column projection to get all the columns. */
-    public static final String[] PROJECTION = new String[] {
-        _ID, // 0
-        MANUFACTURER, // 1
-        MODEL // 2
-    };
-    
     /** A default column projection map to get all the columns. */
     public static final Map<String, String> PROJECTION_MAP =
         new HashMap<String, String>();
