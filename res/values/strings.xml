@@ -23,4 +23,11 @@
         <item>"4"</item>
         <item>"5"</item>
     </string-array>
+<string name="NextShot">Next Shot</string>
+<string name="SkipShot">Skip Shot</string>
+<string name="DistanceBackGreen">Distance to Back of Green</string>
+<string name="DistanceMiddleGreen">Distance to Middle of Green</string>
+<string name="DistanceFrontGreen">Distance to Front of Green</string>
+<string name="Putt">Putt</string>
+<string name="DistanceShot">Distance of Current Shot</string>
 </resources>

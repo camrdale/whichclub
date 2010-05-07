@@ -24,7 +24,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 public class SelectHole extends Activity {
 
     /** Logging tag. */
-    private static final String TAG = null;
+    private static final String TAG = "SelectHole";
     /** The key to use to store the saved position of the cursor. */
     private static final String SAVED_POSITION = "saved_position";
     
