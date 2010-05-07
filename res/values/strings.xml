@@ -30,4 +30,6 @@
 <string name="DistanceFrontGreen">Distance to Front of Green</string>
 <string name="Putt">Putt</string>
 <string name="DistanceShot">Distance of Current Shot</string>
+<string name="Cancel">Cancel</string>
+<string name="ChooseClub">Choose A Club</string>
 </resources>

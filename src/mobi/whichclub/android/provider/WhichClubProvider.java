@@ -13,10 +13,13 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import mobi.whichclub.android.data.Club;
 import mobi.whichclub.android.data.Course;
 import mobi.whichclub.android.data.Hole;
 import mobi.whichclub.android.data.Player;
 import mobi.whichclub.android.data.Round;
+import mobi.whichclub.android.data.Shot;
+import mobi.whichclub.android.data.Club.ClubType;
 
 /**
  * Provides access to the WhichClub database of shots.
@@ -42,13 +45,21 @@ public class WhichClubProvider extends ContentProvider {
     /** URI matching results. */
     private static final int ROUND_ID = 6;
     /** URI matching results. */
-    private static final int ROUNDS_FOR_COURSE_ID = 7;
+    private static final int CLUBS = 7;
     /** URI matching results. */
-    private static final int ROUNDS_FOR_PLAYER_ID = 8;
+    private static final int CLUB_ID = 8;
     /** URI matching results. */
-    private static final int HOLES_FOR_COURSE_ID = 9;
+    private static final int SHOTS = 9;
     /** URI matching results. */
-    private static final int HOLES_FOR_ROUND_ID = 10;
+    private static final int SHOT_ID = 10;
+    /** URI matching results. */
+    private static final int ROUNDS_FOR_COURSE_ID = 11;
+    /** URI matching results. */
+    private static final int ROUNDS_FOR_PLAYER_ID = 12;
+    /** URI matching results. */
+    private static final int HOLES_FOR_COURSE_ID = 13;
+    /** URI matching results. */
+    private static final int HOLES_FOR_ROUND_ID = 14;
     /** URI matcher. */
     private static final UriMatcher URI_MATCHER;
     /** The database helper to use to open it. */
@@ -104,6 +115,22 @@ public class WhichClubProvider extends ContentProvider {
             qb.setTables(Round.TABLE_NAME);
             qb.setProjectionMap(Round.PROJECTION_MAP);
             orderBy = getOrderBy(sortOrder, Round.DEFAULT_SORT_ORDER);
+            break;
+
+        case CLUB_ID:
+            qb.appendWhere(Club._ID + "=" + uri.getPathSegments().get(1));
+        case CLUBS:
+            qb.setTables(Club.TABLE_NAME);
+            qb.setProjectionMap(Club.PROJECTION_MAP);
+            orderBy = getOrderBy(sortOrder, Club.DEFAULT_SORT_ORDER);
+            break;
+
+        case SHOT_ID:
+            qb.appendWhere(Shot._ID + "=" + uri.getPathSegments().get(1));
+        case SHOTS:
+            qb.setTables(Shot.TABLE_NAME);
+            qb.setProjectionMap(Shot.PROJECTION_MAP);
+            orderBy = getOrderBy(sortOrder, Shot.DEFAULT_SORT_ORDER);
             break;
 
         case ROUNDS_FOR_COURSE_ID:
@@ -172,6 +199,22 @@ public class WhichClubProvider extends ContentProvider {
         case ROUND_ID:
             return Round.CONTENT_ITEM_TYPE;
 
+        case HOLES_FOR_COURSE_ID:
+        case HOLES_FOR_ROUND_ID:
+            return Hole.CONTENT_MULTI_TYPE;
+
+        case CLUBS:
+            return Club.CONTENT_MULTI_TYPE;
+
+        case CLUB_ID:
+            return Club.CONTENT_ITEM_TYPE;
+
+        case SHOTS:
+            return Shot.CONTENT_MULTI_TYPE;
+
+        case SHOT_ID:
+            return Shot.CONTENT_ITEM_TYPE;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -179,8 +222,6 @@ public class WhichClubProvider extends ContentProvider {
 
     @Override
     public final Uri insert(final Uri uri, final ContentValues initialValues) {
-        Log.d(TAG, "Inserting " + uri + ": " + initialValues.toString());
-        
         String table;
         String nullColumnHack;
         ContentValues values;
@@ -210,9 +251,24 @@ public class WhichClubProvider extends ContentProvider {
             }
             break;
 
+        case CLUBS:
+            table = Club.TABLE_NAME;
+            nullColumnHack = Club.DESCRIPTION;
+            break;
+
+        case SHOTS:
+            table = Shot.TABLE_NAME;
+            nullColumnHack = Shot.DISTANCE;
+            if (!values.containsKey(Club.SORT_ORDER) && values.containsKey(Club.TYPE)) {
+                values.put(Club.SORT_ORDER, ClubType.valueOf(values.getAsString(Club.TYPE)).getSortOrder());
+            }
+            break;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
+        
+        Log.d(TAG, "Inserting " + uri + ": " + values.toString());
         
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         long rowId = db.insert(table, nullColumnHack, values);
@@ -248,9 +304,6 @@ public class WhichClubProvider extends ContentProvider {
     @Override
     public final int delete(final Uri uri,
             final String where, final String[] whereArgs) {
-        Log.d(TAG, "Deleting " + uri + " where "
-                + where + "[" + whereArgs + "]");
-        
         String table;
         String recordId = null;
         
@@ -271,6 +324,18 @@ public class WhichClubProvider extends ContentProvider {
             recordId = uri.getPathSegments().get(1);
         case ROUNDS:
             table = Round.TABLE_NAME;
+            break;
+
+        case CLUB_ID:
+            recordId = uri.getPathSegments().get(1);
+        case CLUBS:
+            table = Club.TABLE_NAME;
+            break;
+
+        case SHOT_ID:
+            recordId = uri.getPathSegments().get(1);
+        case SHOTS:
+            table = Shot.TABLE_NAME;
             break;
 
         default:
@@ -283,6 +348,8 @@ public class WhichClubProvider extends ContentProvider {
             nonEmptyWhere = "1";
         }
 
+        Log.d(TAG, "Deleting " + uri + " where " + where + "[" + whereArgs + "]");
+        
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int count = db.delete(table, whereWithId(recordId, nonEmptyWhere), whereArgs);
         
@@ -293,9 +360,6 @@ public class WhichClubProvider extends ContentProvider {
     @Override
     public final int update(final Uri uri, final ContentValues values,
             final String where, final String[] whereArgs) {
-        Log.d(TAG, "Updating " + uri + " where "
-                + where + "[" + whereArgs + "]");
-
         String table;
         String recordId = null;
         
@@ -318,9 +382,23 @@ public class WhichClubProvider extends ContentProvider {
             table = Round.TABLE_NAME;
             break;
 
+        case CLUB_ID:
+            recordId = uri.getPathSegments().get(1);
+        case CLUBS:
+            table = Club.TABLE_NAME;
+            break;
+
+        case SHOT_ID:
+            recordId = uri.getPathSegments().get(1);
+        case SHOTS:
+            table = Shot.TABLE_NAME;
+            break;
+
         default:
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
+
+        Log.d(TAG, "Updating " + uri + " where " + where + "[" + whereArgs + "]: " + values.toString());
 
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int count = db.update(table, values,
@@ -338,6 +416,10 @@ public class WhichClubProvider extends ContentProvider {
         URI_MATCHER.addURI(AUTHORITY, Player.TABLE_NAME + "/#", PLAYER_ID);
         URI_MATCHER.addURI(AUTHORITY, Round.TABLE_NAME, ROUNDS);
         URI_MATCHER.addURI(AUTHORITY, Round.TABLE_NAME + "/#", ROUND_ID);
+        URI_MATCHER.addURI(AUTHORITY, Club.TABLE_NAME, CLUBS);
+        URI_MATCHER.addURI(AUTHORITY, Club.TABLE_NAME + "/#", CLUB_ID);
+        URI_MATCHER.addURI(AUTHORITY, Shot.TABLE_NAME, SHOTS);
+        URI_MATCHER.addURI(AUTHORITY, Shot.TABLE_NAME + "/#", SHOT_ID);
         URI_MATCHER.addURI(AUTHORITY, Course.TABLE_NAME + "/#/" + Round.TABLE_NAME, ROUNDS_FOR_COURSE_ID);
         URI_MATCHER.addURI(AUTHORITY, Player.TABLE_NAME + "/#/" + Round.TABLE_NAME, ROUNDS_FOR_PLAYER_ID);
         URI_MATCHER.addURI(AUTHORITY, Course.TABLE_NAME + "/#/" + Hole.TABLE_NAME, HOLES_FOR_COURSE_ID);

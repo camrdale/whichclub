@@ -18,7 +18,24 @@ public class Club implements BaseColumns {
      */
     public static enum ClubType {
         /** Club type. */
-        Driver, Wood, Iron, Wedge, Putter;
+        Driver(100), Wood(200), Iron(300), Wedge(400), Putter(500);
+        
+        /** The default order to sort the club types in.*/
+        private int sortOrder;
+
+        /**
+         * @param sort the sorting order
+         */
+        ClubType(final int sort) {
+            sortOrder = sort;
+        }
+
+        /**
+         * @return the sorting order
+         */
+        public int getSortOrder() {
+            return sortOrder;
+        }
     }
 
     /** The name of the table. */
@@ -34,6 +51,10 @@ public class Club implements BaseColumns {
     public static final String MODEL = "model";
     /** The description of the club column (String). */
     public static final String DESCRIPTION = "description";
+    /** The abbreviated description of the club column (String). */
+    public static final String ABBR = "abbr";
+    /** The sorting order of the club column (Integer). */
+    public static final String SORT_ORDER = "sort_order";
     
     /** The content:// style URL for this table. */
     public static final Uri CONTENT_URI = Uri.parse(
@@ -48,8 +69,7 @@ public class Club implements BaseColumns {
         "vnd.android.cursor.item/vnd.which" + TABLE_NAME;
 
     /** The default sort order for records returned from this table. */
-    public static final String DEFAULT_SORT_ORDER =
-        TYPE + " ASC" + ", " + NUMBER + " ASC";
+    public static final String DEFAULT_SORT_ORDER = SORT_ORDER + " ASC, " + NUMBER + " ASC";
 
     /** A default column projection map to get all the columns. */
     public static final Map<String, String> PROJECTION_MAP =
@@ -62,6 +82,8 @@ public class Club implements BaseColumns {
         PROJECTION_MAP.put(MANUFACTURER, MANUFACTURER);
         PROJECTION_MAP.put(MODEL, MODEL);
         PROJECTION_MAP.put(DESCRIPTION, DESCRIPTION);
+        PROJECTION_MAP.put(ABBR, ABBR);
+        PROJECTION_MAP.put(SORT_ORDER, SORT_ORDER);
     }
 
     /** Protected default constructor for utility class. */

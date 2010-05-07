@@ -91,6 +91,7 @@ public class Main extends Activity {
         } else {
             stats += 0 + "\n";
         }
+        cursor.close();
         return stats;
     }
 

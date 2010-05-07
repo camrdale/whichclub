@@ -1,8 +1,9 @@
 package mobi.whichclub.android;
 
 import mobi.whichclub.android.data.Hole;
-import android.app.Activity;
+import mobi.whichclub.android.data.Shot;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -21,7 +22,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
  * The UI page to select the hole to go to.
  * @author camrdale
  */
-public class SelectHole extends Activity {
+public class SelectHole extends ClubChooserActivity {
 
     /** Logging tag. */
     private static final String TAG = "SelectHole";
@@ -45,6 +46,8 @@ public class SelectHole extends Activity {
         HOLE_PROJECTION[HOLE_HANDICAP] = Hole.HANDICAP;
     }
     
+    /** The URI of the data for this activity. */
+    private Uri uri;
     /** The cursor containing the queried data. */
     private Cursor cursor;
     /** The text containing the number of the hole. */
@@ -64,6 +67,13 @@ public class SelectHole extends Activity {
 
         @Override
         public void onNothingSelected(final AdapterView<?> parent) { }
+    };
+    /** The listener to use for presses on the BeginTeeShot button. */
+    private OnClickListener mTeeShotListener = new OnClickListener() {
+        @Override
+        public void onClick(final View v) {
+        	beginTeeShot();
+        }
     };
     /** The listener to use for presses on the Prev button. */
     private OnClickListener mPrevHoleListener = new OnClickListener() {
@@ -94,7 +104,7 @@ public class SelectHole extends Activity {
 
         final Intent intent = getIntent();
 
-        Uri uri = intent.getData();
+        uri = intent.getData();
         
         // If we were unable to create a new round, then just finish
         // this activity.  A RESULT_CANCELED will be sent back to the
@@ -109,6 +119,7 @@ public class SelectHole extends Activity {
         setContentView(R.layout.select_hole);
         
         // Hook up button presses to the appropriate event handlers.
+        ((Button) findViewById(R.id.BeginTeeShot)).setOnClickListener(mTeeShotListener);
         ((Button) findViewById(R.id.Prev)).setOnClickListener(mPrevHoleListener);
         ((Button) findViewById(R.id.Next)).setOnClickListener(mNextHoleListener);
         ((Spinner) findViewById(R.id.ParChooser)).setOnItemSelectedListener(mParChosenListener);
@@ -167,6 +178,34 @@ public class SelectHole extends Activity {
         cursor.moveToPosition(currentPosition);
         holeText.setText(Integer.toString(cursor.getInt(HOLE_NUMBER)));
         parText.setText(Integer.toString(cursor.getInt(HOLE_PAR)));
+    }
+
+    /**
+     * Show the club chooser dialog for the new shot.
+     */
+    private void beginTeeShot() {
+        // Save the current location from the GPS
+        // TODO: learn to use the GPS
+        
+		// Show the club chooser
+        chooseClub();
+	}
+
+    @Override
+    protected final void clubChosen(final Uri clubUri) {
+        ContentValues values = new ContentValues();
+        values.put(Shot.CLUB, Long.parseLong(clubUri.getPathSegments().get(1)));
+        values.put(Shot.BALL, 1);
+        values.put(Shot.HOLE, cursor.getInt(HOLE_ID));
+        values.put(Shot.NUMBER, 1);
+        values.put(Shot.ROUND, uri.getPathSegments().get(1));
+        values.put(Shot.START_LATITUDE, 0.000);
+        values.put(Shot.START_LONGITUDE, 0.000);
+        Uri newShot = getContentResolver().insert(Shot.CONTENT_URI, values);
+        
+        Intent shotIntent = new Intent(this, NextShot.class);
+        shotIntent.setData(newShot);
+        startActivity(shotIntent);
     }
 
 }

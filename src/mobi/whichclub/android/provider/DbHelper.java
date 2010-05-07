@@ -82,10 +82,12 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + Club.TABLE_NAME + " ("
                 + Club._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + Club.DESCRIPTION + " TEXT,"
+                + Club.ABBR + " TEXT,"
                 + Club.MANUFACTURER + " TEXT,"
                 + Club.MODEL + " TEXT,"
                 + Club.NUMBER + " INTEGER,"
-                + Club.TYPE + " TEXT"
+                + Club.TYPE + " TEXT,"
+                + Club.SORT_ORDER + " INTEGER"
                 + ");");
         db.execSQL("CREATE TABLE " + Hole.TABLE_NAME + " ("
                 + Hole._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -199,31 +201,51 @@ public class DbHelper extends SQLiteOpenHelper {
     private static void initializeClubs(final SQLiteDatabase db) {
         Log.d(TAG, "Creating a set of default clubs");
         ContentValues values = new ContentValues();
+
         values.put(Club.TYPE, Club.ClubType.Driver.name());
+        values.put(Club.SORT_ORDER, Club.ClubType.Driver.getSortOrder());
         values.put(Club.DESCRIPTION, "Driver");
+        values.put(Club.ABBR, "D");
         db.insert(Club.TABLE_NAME, null, values);
+        
         values.put(Club.TYPE, Club.ClubType.Wood.name());
+        values.put(Club.SORT_ORDER, Club.ClubType.Wood.getSortOrder());
         values.put(Club.NUMBER, 3);
         values.put(Club.DESCRIPTION, "3 Wood");
+        values.put(Club.ABBR, "3W");
         db.insert(Club.TABLE_NAME, null, values);
+
         values.put(Club.NUMBER, 5);
         values.put(Club.DESCRIPTION, "5 Wood");
+        values.put(Club.ABBR, "5W");
         db.insert(Club.TABLE_NAME, null, values);
+
         values.put(Club.TYPE, Club.ClubType.Iron.name());
+        values.put(Club.SORT_ORDER, Club.ClubType.Iron.getSortOrder());
         for (int i = 3; i <= 9; i++) {
             values.put(Club.NUMBER, i);
             values.put(Club.DESCRIPTION, i + " Iron");
+            values.put(Club.ABBR, i + "I");
             db.insert(Club.TABLE_NAME, null, values);
         }
+
         values.put(Club.TYPE, Club.ClubType.Wedge.name());
+        values.put(Club.SORT_ORDER, Club.ClubType.Wedge.getSortOrder());
         values.put(Club.NUMBER, 10);
         values.put(Club.DESCRIPTION, "Pitching Wedge");
+        values.put(Club.ABBR, "PW");
         db.insert(Club.TABLE_NAME, null, values);
+        
         values.put(Club.NUMBER, 11);
         values.put(Club.DESCRIPTION, "Sand Wedge");
+        values.put(Club.ABBR, "SW");
         db.insert(Club.TABLE_NAME, null, values);
+        
+        values.clear();
         values.put(Club.TYPE, Club.ClubType.Putter.name());
+        values.put(Club.SORT_ORDER, Club.ClubType.Putter.getSortOrder());
         values.put(Club.DESCRIPTION, "Putter");
+        values.put(Club.ABBR, "P");
         db.insert(Club.TABLE_NAME, null, values);
     }
 

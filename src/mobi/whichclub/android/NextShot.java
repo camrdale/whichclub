@@ -1,8 +1,8 @@
 package mobi.whichclub.android;
 
 import mobi.whichclub.android.data.Shot;
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -18,7 +18,7 @@ import android.widget.TextView;
  * The UI page to select the hole to go to.
  * @author camrdale
  */
-public class NextShot extends Activity {
+public class NextShot extends ClubChooserActivity {
 
     /** Logging tag. */
     private static final String TAG = "NextShot";
@@ -49,6 +49,8 @@ public class NextShot extends Activity {
         SHOT_PROJECTION[SHOT_START_LONGITUDE] = Shot.START_LONGITUDE;
     }
     
+    /** The URI of the data for this activity. */
+    private Uri uri;
     /** The cursor containing the queried data. */
     private Cursor cursor;
     /** The text containing the current distance of the shot. */
@@ -58,6 +60,7 @@ public class NextShot extends Activity {
     private OnClickListener mNextShotListener = new OnClickListener() {
         @Override
         public void onClick(final View v) {
+            nextShot();
         }
     };
     /** The listener to use for presses on the Putt button. */
@@ -73,7 +76,7 @@ public class NextShot extends Activity {
 
         final Intent intent = getIntent();
 
-        Uri uri = intent.getData();
+        uri = intent.getData();
         
         // If we were unable to create a new shot, then just finish
         // this activity.  A RESULT_CANCELED will be sent back to the
@@ -127,6 +130,37 @@ public class NextShot extends Activity {
      */
     private void updateState() {
         distanceText.setText(Integer.toString(cursor.getInt(SHOT_NUMBER)));
+    }
+
+    /**
+     * Finish this shot and start a new one.
+     */
+    private void nextShot() {
+        chooseClub();
+    }
+
+    @Override
+    protected final void clubChosen(final Uri clubUri) {
+        ContentValues values = new ContentValues();
+        values.put(Shot.DISTANCE, 0.000);
+        values.put(Shot.END_LATITUDE, 0.000);
+        values.put(Shot.END_LONGITUDE, 0.000);
+        getContentResolver().update(uri, values, null, null);
+        
+        values.clear();
+        values.put(Shot.CLUB, Long.parseLong(clubUri.getPathSegments().get(1)));
+        values.put(Shot.BALL, cursor.getLong(SHOT_BALL));
+        values.put(Shot.HOLE, cursor.getLong(SHOT_HOLE));
+        values.put(Shot.ROUND, cursor.getLong(SHOT_ROUND));
+        values.put(Shot.NUMBER, cursor.getInt(SHOT_NUMBER) + 1);
+        values.put(Shot.START_LATITUDE, 0.000);
+        values.put(Shot.START_LONGITUDE, 0.000);
+        Uri newShot = getContentResolver().insert(Shot.CONTENT_URI, values);
+        
+        Intent shotIntent = new Intent(this, NextShot.class);
+        shotIntent.setData(newShot);
+        startActivity(shotIntent);
+        finish();
     }
 
 }
