@@ -92,14 +92,16 @@ public class DbHelper extends SQLiteOpenHelper {
                 + Hole.COURSE + " INTEGER,"
                 + Hole.HANDICAP + " INTEGER,"
                 + Hole.NUMBER + " INTEGER,"
-                + Hole.PAR + " INTEGER"
+                + Hole.PAR + " INTEGER,"
+                + "FOREIGN KEY(" + Hole.COURSE + ") REFERENCES " + Course.TABLE_NAME + "(" + Course._ID + ")"
                 + ");");
         db.execSQL("CREATE TABLE " + Location.TABLE_NAME + " ("
                 + Location._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + Location.DESCRIPTION + " TEXT,"
                 + Location.HOLE + " INTEGER,"
                 + Location.LATITUDE + " REAL,"
-                + Location.LONGITUDE + " REAL"
+                + Location.LONGITUDE + " REAL,"
+                + "FOREIGN KEY(" + Location.HOLE + ") REFERENCES " + Hole.TABLE_NAME + "(" + Hole._ID + ")"
                 + ");");
         db.execSQL("CREATE TABLE " + Round.TABLE_NAME + " ("
                 + Round._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -107,7 +109,9 @@ public class DbHelper extends SQLiteOpenHelper {
                 + Round.DATE + " INTEGER,"
                 + Round.GIR + " INTEGER,"
                 + Round.PLAYER + " INTEGER,"
-                + Round.SCORE + " INTEGER"
+                + Round.SCORE + " INTEGER,"
+                + "FOREIGN KEY(" + Round.COURSE + ") REFERENCES " + Course.TABLE_NAME + "(" + Course._ID + "),"
+                + "FOREIGN KEY(" + Round.PLAYER + ") REFERENCES " + Player.TABLE_NAME + "(" + Player._ID + ")"
                 + ");");
         db.execSQL("CREATE TABLE " + Shot.TABLE_NAME + " ("
                 + Shot._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -123,7 +127,11 @@ public class DbHelper extends SQLiteOpenHelper {
                 + Shot.END_LATITUDE + " REAL,"
                 + Shot.END_LONGITUDE + " REAL,"
                 + Shot.WIND_DIR + " REAL,"
-                + Shot.WIND_SPEED + " REAL"
+                + Shot.WIND_SPEED + " REAL,"
+                + "FOREIGN KEY(" + Shot.ROUND + ") REFERENCES " + Round.TABLE_NAME + "(" + Round._ID + "),"
+                + "FOREIGN KEY(" + Shot.HOLE + ") REFERENCES " + Hole.TABLE_NAME + "(" + Hole._ID + "),"
+                + "FOREIGN KEY(" + Shot.CLUB + ") REFERENCES " + Club.TABLE_NAME + "(" + Club._ID + "),"
+                + "FOREIGN KEY(" + Shot.BALL + ") REFERENCES " + Ball.TABLE_NAME + "(" + Ball._ID + ")"
                 + ");");
         initializeDatabase(db);
     }
