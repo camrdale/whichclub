@@ -56,6 +56,11 @@ public class Main extends Activity {
                 .setOnClickListener(mNewRoundListener);
         ((Button) findViewById(R.id.FindCourse))
                 .setOnClickListener(mFindCourseListener);
+    }
+
+    @Override
+    protected final void onResume() {
+        super.onResume();
         
         StringBuilder stats = new StringBuilder();
         DbHelper helper = new DbHelper(getApplicationContext());
